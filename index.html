@@ -95,7 +95,9 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-off
 /* Übersicht */
 .ov{display:grid;gap:10px}
 .ovc{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px 14px;cursor:pointer}
-.ovc .t{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ovc .t{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ovc .t > div:first-child{flex:1 1 0;min-width:0}
+.ovc .t .lw{flex:none}
 .ovc .t b{font-family:var(--display);font-weight:500;font-size:1.1rem}
 .ovc .t span.r{display:block;font-size:.76rem;color:var(--muted)}
 .ovc .t .lw{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
@@ -108,11 +110,14 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-off
 .stats .fd{font-size:.72rem;color:var(--muted)}
 .stats .fl{white-space:nowrap}
 /* 7 Tage */
-.day{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.day{display:grid;grid-template-columns:4.2em minmax(0,1fr) auto auto;gap:4px 10px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
 .card h2 + .day{border-top:0}
-.day .d{font-weight:600;flex:0 0 4.2em}
-.day .w{flex:1 1 7em}
-.day .s{margin-left:auto}
+.day .d{font-weight:600}
+.card{container-type:inline-size}
+@container (max-width: 21em){
+  .day{display:flex;flex-wrap:wrap}
+  .day .d{flex:0 0 4.2em}.day .w{flex:1 1 7em}.day .s{margin-left:auto}
+}
 .day .d span{display:block;font:400 .72rem var(--mono);color:var(--muted)}
 .day .w{font-size:.84rem;color:var(--muted);min-width:0;line-height:1.3}
 .day .w span{display:block;font:400 .72rem var(--mono);overflow:hidden;text-overflow:ellipsis}
@@ -168,9 +173,30 @@ a.btn,button.btn{display:inline-flex;align-items:center;gap:6px;font:600 .86rem 
 .vstrip figcaption{padding:12px 16px 18px;color:#c9d4dc;font-size:.88rem;text-align:center}
 .vstrip figcaption a{color:#8fcbf0}
 .viewer .camnav{top:calc(50% - 22px);background:rgba(20,28,34,.8);border-color:#2a3a46;color:#e9eef2}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill.soft{background:transparent;border:1px solid var(--line);font-weight:500;color:var(--muted)}
+.depthrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(8em,1fr));gap:8px 14px;padding-top:10px;border-top:1px solid var(--line)}
+.depthrow > div{display:grid;gap:1px;min-width:0}
+.depthrow .fl{font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)}
+.depthrow .fv{font:500 1.12rem/1.2 var(--mono)}
+.depthrow .fd{font-size:.72rem;color:var(--muted)}
+.ovc .t span.r.inv{color:var(--warm)}
+.hours{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:4px 12px 8px}
+.hc{display:grid;justify-items:center;gap:4px;padding:8px 2px;border-radius:10px;text-align:center}
+.hc .hh{font:400 .72rem var(--mono);color:var(--muted)}
+.hc .ht{font:500 .95rem var(--mono)}
+.hc .hs{font-size:.7rem;color:var(--muted);line-height:1.2}
+.wi{width:28px;height:28px;display:block}
+.note b.sunsum{color:var(--warm);font-weight:600}
+.hint{display:flex;align-items:center;gap:8px;padding:0 16px 12px;font-size:.82rem;color:var(--fg)}
+.hint .wi{width:20px;height:20px;flex:none}
+.sunbar{display:inline-block;width:38px;height:5px;border-radius:3px;background:var(--line);vertical-align:middle;margin-right:6px;overflow:hidden}
+.sunbar i{display:block;height:100%;background:var(--warm);border-radius:3px}
+.day .s small{display:block;font:400 .7rem var(--mono);color:var(--muted);text-align:right}
 .chev{width:16px;height:16px;color:var(--muted);margin-left:4px;flex:none}
 .legend i.dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
-.legend i.dash{width:16px;height:0;border-top:2px dashed var(--muted);border-radius:0}
+.legend i.dash{width:16px;height:0;border-top:2px dashed var(--c,var(--muted));border-radius:0;background:none}
+.legend i.solid{width:16px;height:0;border-top:2px solid var(--c,var(--snow));border-radius:0;background:none}
 .note b.closed{color:var(--fg);font-weight:600}
 .empty b{color:var(--fg);font-weight:600}
 details summary .cnt{float:right;color:var(--muted);font:400 .78rem var(--mono)}
@@ -215,8 +241,8 @@ footer a{color:var(--accent)}
 <script>
 "use strict";
 /* ---------- Grundlagen ---------- */
-const HOURLY = "temperature_2m,snowfall,snow_depth,freezing_level_height,weather_code,wind_gusts_10m,cloud_cover";
-const DAILY = "weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,sunshine_duration,wind_gusts_10m_max";
+const HOURLY = "temperature_2m,snowfall,snow_depth,freezing_level_height,weather_code,wind_gusts_10m,cloud_cover,sunshine_duration,visibility,precipitation";
+const DAILY = "weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,sunshine_duration,wind_gusts_10m_max,daylight_duration";
 const CURRENT = "temperature_2m,weather_code,wind_gusts_10m,snowfall";
 const PALETTES = [
   ["gletscher","Gletscher",["#0c1620","#7cc4ea","#cfe9f8"]],
@@ -293,6 +319,62 @@ function pointStats(d){
     depth: h.snow_depth[i] != null ? h.snow_depth[i] * 100 : null,
     freezing: h.freezing_level_height[i],
   };
+}
+
+/* ---------- Sonne und Tal ---------- */
+function sunHours(d, k){ const v = d && d.daily && d.daily.sunshine_duration ? d.daily.sunshine_duration[k] : null; return v == null ? null : v / 3600; }
+function daylightHours(d, k){ const v = d && d.daily && d.daily.daylight_duration ? d.daily.daylight_duration[k] : null; return v == null ? null : v / 3600; }
+function talPoint(r){ return r.points.length > 1 ? pointData(r, 0) : null; }
+// Hochnebel: laut Vorhersage im Tal kaum Sonne, am Berg deutlich mehr
+function inversion(r, k){
+  const b = sunHours(pointData(r, r.points.length - 1), k), t = sunHours(talPoint(r), k);
+  return b != null && t != null && t < 1.5 && b >= 3 && b - t >= 2;
+}
+function hourKind(d, i){
+  const H = d.hourly, c = H.weather_code[i];
+  if((c >= 71 && c <= 77) || c === 85 || c === 86) return "snow";
+  if((c >= 51 && c <= 67) || (c >= 80 && c <= 82)) return "rain";
+  if(c === 45 || c === 48 || (H.visibility && H.visibility[i] != null && H.visibility[i] < 1000)) return "fog";
+  const sun = H.sunshine_duration ? H.sunshine_duration[i] : null;
+  if(sun != null) return sun >= 2160 ? "sun" : sun >= 720 ? "partly" : "cloud";
+  const cc = H.cloud_cover ? H.cloud_cover[i] : 50;
+  return cc < 30 ? "sun" : cc < 70 ? "partly" : "cloud";
+}
+const KIND_TXT = {sun:"sonnig", partly:"teils sonnig", cloud:"bewölkt", snow:"Schneefall", rain:"Regen", fog:"Nebel"};
+function wxIcon(kind){
+  const sun = `<circle cx="12" cy="12" r="4.2" fill="var(--warm)"/><g stroke="var(--warm)" stroke-width="1.6" stroke-linecap="round"><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></g>`;
+  const cloud = (y, col) => `<path d="M7 ${18+y}h10.5a3.6 3.6 0 0 0 .4-7.2 5.2 5.2 0 0 0-10-1.1A3.9 3.9 0 0 0 7 ${18+y}z" fill="${col}"/>`;
+  const g = {
+    sun,
+    partly: `<g transform="translate(-3,-3) scale(.8)">${sun}</g>` + cloud(1, "var(--muted)"),
+    cloud: cloud(0, "var(--muted)"),
+    snow: cloud(-3, "var(--muted)") + `<g fill="var(--snow)"><circle cx="8.5" cy="19.5" r="1.2"/><circle cx="12.5" cy="21" r="1.2"/><circle cx="16.5" cy="19.5" r="1.2"/></g>`,
+    rain: cloud(-3, "var(--muted)") + `<g stroke="var(--cool)" stroke-width="1.6" stroke-linecap="round"><path d="M9 18.5l-1 2.5M13 18.5l-1 2.5M17 18.5l-1 2.5"/></g>`,
+    fog: `<g stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round"><path d="M4 9h16M6 13h12M4 17h16"/></g>`,
+  }[kind];
+  return `<svg class="wi" viewBox="0 0 24 24" aria-hidden="true">${g}</svg>`;
+}
+/* Tagesverlauf am Berg: heute, ab 15 Uhr morgen; 8 bis 16 Uhr im Zwei-Stunden-Takt */
+function dayCourseHTML(r, d, s){
+  if(!d.hourly.sunshine_duration && !d.hourly.cloud_cover) return "";
+  const now = d.current.time, tomorrow = Number(now.slice(11,13)) >= 15;
+  const k = s.di + (tomorrow ? 1 : 0); if(k < 0 || k >= d.daily.time.length) return "";
+  const date = d.daily.time[k], P = r.points[r.points.length - 1];
+  const cells = [8,10,12,14,16].map(hh => {
+    const i = d.hourly.time.indexOf(date + "T" + String(hh).padStart(2,"0") + ":00"); if(i < 0) return "";
+    const kind = hourKind(d, i), sn = sumSnow(d, i - 1, i);
+    return `<div class="hc" title="${KIND_TXT[kind]}"><span class="hh">${hh} Uhr</span>${wxIcon(kind)}<span class="ht">${fmtT(d.hourly.temperature_2m[i])}</span><span class="hs">${sn >= 0.5 ? "+" + Math.max(1, Math.round(sn)) + " cm" : KIND_TXT[kind]}</span></div>`;
+  }).join("");
+  const sun = sunHours(d, k), day = daylightHours(d, k);
+  let vis = "";
+  if(d.hourly.visibility){
+    let minV = Infinity; for(const hh of [9,10,11,12,13,14,15]){ const i = d.hourly.time.indexOf(date + "T" + String(hh).padStart(2,"0") + ":00"); if(i >= 0 && d.hourly.visibility[i] != null) minV = Math.min(minV, d.hourly.visibility[i]); }
+    if(minV < 1000) vis = " · zeitweise Nebel, Sicht unter 1 km";
+  }
+  const inv = inversion(r, k) ? `<div class="hint">${wxIcon("sun")}Laut Vorhersage im Tal trüb, am Berg sonnig (Hochnebel).</div>` : "";
+  return `<div class="card"><h2>${tomorrow ? "Morgen" : "Heute"} am Berg <small>${esc(P.name)} ${P.elev} m</small></h2>
+    <div class="hours">${cells}</div>
+    <div class="note">${sun != null ? `<b class="sunsum">${Math.round(sun)} h Sonne</b>${day ? " von " + Math.round(day) + " h Tageslicht" : ""}` : ""}${vis}</div>${inv}</div>`;
 }
 
 /* ---------- Bester Skitag ----------
@@ -411,10 +493,15 @@ function reported(r){
   const st = STAT && STAT[r.id];
   return st && st.snow && st.snow.mountain > 0 ? st.snow : null;
 }
-function depthCell(r, berg){
-  const rep = reported(r);
-  if(rep) return `<div><div class="fl">Schneehöhe</div><div class="fv">${cm(rep.mountain)}<small> cm</small></div><div class="fd">laut Skigebiet</div></div>`;
-  return `<div><div class="fl">Schneehöhe</div><div class="fv">${berg ? cm(berg.depth) : "–"}<small> cm</small></div><div class="fd">Modell, Berg</div></div>`;
+// Schneehöhe Berg und Tal: Meldung des Skigebiets, wenn vorhanden, sonst Modell (Bergstation / unterster Punkt)
+function depths(r){
+  const rep = reported(r), b = pointStats(pointData(r, r.points.length - 1)), t = r.points.length > 1 ? pointStats(pointData(r, 0)) : null;
+  if(rep) return {berg: rep.mountain, tal: rep.valley != null ? rep.valley : (t ? t.depth : null), src: "laut Skigebiet"};
+  return {berg: b ? b.depth : null, tal: t ? t.depth : null, src: "Modell"};
+}
+function depthCell(r){
+  const dp = depths(r);
+  return `<div><div class="fl">Schneehöhe</div><div class="fv">${cm(dp.berg)}<small> cm</small></div><div class="fd">${dp.tal != null ? "Tal " + cm(dp.tal) + " cm" : "Berg"}${dp.src === "Modell" ? "" : " · gemeldet"}</div></div>`;
 }
 function emptyHTML(){
   if(LOADING) return `<div class="card"><div class="empty">Daten werden geladen …</div></div>`;
@@ -427,16 +514,16 @@ function overviewHTML(){
     const berg = pointStats(pointData(r, r.points.length - 1));
     const top = r.points[r.points.length - 1];
     return `<button type="button" class="ovc" data-go="${esc(r.id)}" aria-label="${esc(r.name)}: Details öffnen">
-      <div class="t"><div><b>${esc(r.name)}</b><span class="r">${liftLine(r) || esc(r.region || "")}</span><span class="r">${berg ? fmtT(berg.temp) + " · " + wxText(berg.code) : "–"}</span></div>
+      <div class="t"><div><b>${esc(r.name)}</b><span class="r">${liftLine(r) || esc(r.region || "")}</span><span class="r">${berg ? fmtT(berg.temp) + " · " + wxText(berg.code) : "–"}${(() => { const d0 = pointData(r, r.points.length - 1), sh = berg ? sunHours(d0, berg.di) : null; return sh != null ? " · heute\u00a0" + Math.round(sh) + "\u00a0h\u00a0Sonne" : ""; })()}</span>${(() => { const b = pointStats(pointData(r, r.points.length - 1)); return b && inversion(r, b.di) ? `<span class="r inv">Im Tal trüb, oben Sonne</span>` : ""; })()}</div>
         <div class="lw">Lawine ${lawBadge(r)}<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
       <div class="stats">
         <div><div class="fl">Neuschnee</div><div class="fv snow">${berg ? cm(berg.past24) : "–"}<small> cm</small></div><div class="fd">24 h · 72 h: ${berg ? cm(berg.past72) : "–"}</div></div>
         <div><div class="fl">Prognose</div><div class="fv">${berg ? "+" + cm(berg.next72) : "–"}<small> cm</small></div><div class="fd">nächste 3 Tage</div></div>
-        ${depthCell(r, berg)}
+        ${depthCell(r)}
       </div>
       ${(() => { const b = bestDay(r); return b ? `<div class="best">Bester Skitag: <b>${b.label}</b></div>` : ""; })()}
     </button>`;
-  }).join("") + `<p class="status" style="margin:2px 2px 0">Neuschnee und Prognose sind Modellwerte für die Höhe der Bergstation.</p>`;
+  }).join("") + `<p class="status" style="margin:2px 2px 0">Neuschnee und Prognose sind Modellwerte für die Bergstation. Schneehöhe: Meldung des Skigebiets, sonst Modell.</p>`;
 }
 function resortHTML(r){
   const top = r.points.length - 1, P = r.points[top];
@@ -450,10 +537,13 @@ function resortHTML(r){
     <div class="bigrow">
       <div class="big">${cm(s.past24)}<small>cm</small></div>
       <div class="fc"><span class="fl">Nächste 3 Tage</span><span class="fv">+${cm(s.next72)} cm</span><span class="fd">morgen +${cm(s.next24)} cm</span></div>
-      ${(() => { const rp = reported(r); return `<div class="fc"><span class="fl">Schneehöhe</span><span class="fv">${cm(rp ? rp.mountain : s.depth)} cm</span><span class="fd">${rp ? "laut Skigebiet" : "Modellwert"}</span></div>`; })()}
     </div>
-    <span class="pill">${fmtT(s.temp)} · ${wxText(s.code)}${snowline != null ? " · Schneefallgrenze ~" + snowline + " m" : ""}</span>
+    ${(() => { const dp = depths(r), T = r.points.length > 1 ? r.points[0] : null; return `<div class="depthrow">
+      <div><span class="fl">Schneehöhe Berg</span><span class="fv">${cm(dp.berg)} cm</span><span class="fd">${esc(P.elev)} m · ${dp.src}</span></div>
+      ${T ? `<div><span class="fl">Schneehöhe Tal</span><span class="fv">${cm(dp.tal)} cm</span><span class="fd">${esc(T.name)} ${T.elev} m · ${dp.src}</span></div>` : ""}</div>`; })()}
+    <div class="pills"><span class="pill">${fmtT(s.temp)} · ${wxText(s.code)}${(() => { const sh = sunHours(d, s.di); return sh != null ? " · heute " + Math.round(sh) + " h Sonne" : ""; })()}</span>${snowline != null ? `<span class="pill soft">Schneefallgrenze ~${snowline} m</span>` : ""}</div>
   </section>`;
+  h += dayCourseHTML(r, d, s);
   h += lawineHTML(r);
   h += `<div class="card"><h2>Jetzt <small>nach Höhe</small></h2>` + r.points.map((p, i) => {
     const q = pointStats(pointData(r, i)); if(!q) return "";
@@ -590,21 +680,27 @@ function lawineHTML(r){
 }
 function daysHTML(r, d, s){
   const D = d.daily, tal = pointData(r, 0), B = bestDay(r);
-  let h = `<div class="card"><h2>7 Tage <small>Berg · Neuschnee · Temperatur</small></h2>`;
+  let h = `<div class="card"><h2>7 Tage <small>Wetter · Sonne · Neuschnee · Temperatur</small></h2>`;
   for(let k = Math.max(0, s.di); k < D.time.length && k < s.di + 7; k++){
     const dt = new Date(D.time[k] + "T12:00:00");
     const name = k === s.di ? "Heute" : k === s.di + 1 ? "Morgen" : WD[dt.getDay()];
     const sn = D.snowfall_sum[k], sun = D.sunshine_duration[k] != null ? Math.round(D.sunshine_duration[k] / 3600) : null;
     const talMax = tal && tal.daily ? tal.daily.temperature_2m_max[k] : null;
+    const day = daylightHours(d, k), pct = sun != null && day ? Math.min(100, Math.round(sunHours(d, k) / day * 100)) : null;
+    let talTxt = "";
+    if(tal && tal.daily && r.points.length > 1){
+      const tsn = tal.daily.snowfall_sum[k] || 0, tpr = tal.daily.precipitation_sum ? tal.daily.precipitation_sum[k] || 0 : 0;
+      talTxt = tsn >= 0.5 ? "Tal +" + Math.max(1, Math.round(tsn)) : tpr >= 1 ? "Tal Regen" : "Tal –";
+    }
     const isBest = B && B.k === k;
     h += `<div class="day${k === s.di ? " today" : ""}${isBest ? " bestday" : ""}">
       <div class="d">${name}<span>${dt.getDate()}.${dt.getMonth()+1}.</span></div>
-      <div class="w">${wxText(D.weather_code[k])}<span>${isBest ? "<b>Bester Tag</b> · " : ""}${sun != null ? sun + " h Sonne" : ""}</span></div>
-      <div class="s${sn >= 0.5 ? "" : " z"}">${sn >= 0.5 ? "+" + Math.max(1, Math.round(sn)) : "0"}</div>
+      <div class="w">${wxText(D.weather_code[k])}<span>${isBest ? "<b>Bester Tag</b> · " : ""}${pct != null ? `<span class="sunbar" title="${pct} % der hellen Zeit sonnig"><i style="width:${pct}%"></i></span>` : ""}${sun != null ? sun + " h Sonne" : ""}</span></div>
+      <div class="s${sn >= 0.5 ? "" : " z"}">${sn >= 0.5 ? "+" + Math.max(1, Math.round(sn)) : "0"}${talTxt ? `<small>${talTxt}</small>` : ""}</div>
       <div class="t">${fmtT(D.temperature_2m_min[k])} / ${fmtT(D.temperature_2m_max[k])}${talMax != null && r.points.length > 1 ? `<br><i>Tal ${fmtT(talMax)}</i>` : ""}</div>
     </div>`;
   }
-  return h + `<div class="note">Neuschnee in cm am Berg, Temperatur am Berg (min / max), darunter Höchstwert im Tal.${B ? " „Bester Tag“: frischer Schnee, viel Sonne, wenig Wind." : ""}</div></div>`;
+  return h + `<div class="note">Neuschnee in cm am Berg, darunter im Tal. Temperatur am Berg (min / max), darunter Höchstwert im Tal. Der Balken zeigt, wie viel der hellen Zeit sonnig ist.${B ? " „Bester Tag“: frischer Schnee, viel Sonne, wenig Wind." : ""}</div></div>`;
 }
 function chartHTML(d, s){
   const D = d.daily, from = Math.max(0, s.di - 7), n = D.time.length - from;
@@ -662,27 +758,31 @@ function seasonHTML(r){
   const all = HIST && HIST.resorts && HIST.resorts[r.id] || [];
   const t = new Date(), y = t.getMonth() >= 8 ? t.getFullYear() : t.getFullYear() - 1;
   const pts = all.filter(e => e.d >= y + "-10-01");
-  let h = `<div class="card"><h2>Saisonverlauf <small>Schneehöhe Berg</small></h2>`;
+  let h = `<div class="card"><h2>Saisonverlauf <small>Schneehöhe Berg und Tal</small></h2>`;
   if(pts.length < 2) return h + `<div class="note" style="border-top:0">Der Verlauf füllt sich ab jetzt täglich.</div></div>`;
+  // je Höhe eine Linie: Meldung des Skigebiets, sobald es eine gibt, sonst Modell (gestrichelt)
+  const repB = pts.some(e => e.b > 0), repT = pts.some(e => e.t > 0), hasT = pts.some(e => e.mt != null || e.t > 0);
+  const series = [{name:"Berg", key: repB ? "b" : "m", rep: repB, col:"var(--snow)"}];
+  if(hasT) series.push({name:"Tal", key: repT ? "t" : "mt", rep: repT, col:"var(--accent)"});
   const W = 340, H = 150, pl = 30, pr = 8, pt = 10, pb = 22;
   const t0 = Date.parse(pts[0].d), t1 = Date.parse(pts[pts.length-1].d), span = Math.max(t1 - t0, 864e5 * 6);
-  const vals = pts.flatMap(e => [e.m, e.b].filter(v => v != null));
-  const max = Math.max(50, Math.ceil(Math.max(...vals) / 50) * 50);
+  const vals = pts.flatMap(e => series.map(sr => e[sr.key]).filter(v => v != null));
+  const max = Math.max(50, Math.ceil(Math.max(0, ...vals) / 50) * 50);
   const X = d => pl + (Date.parse(d) - t0) / span * (W - pl - pr), Y = v => H - pb - v / max * (H - pt - pb);
   const line = key => { let path = "", pen = false; for(const e of pts){ if(e[key] == null){ pen = false; continue; } path += (pen ? "L" : "M") + X(e.d).toFixed(1) + " " + Y(e[key]).toFixed(1); pen = true; } return path; };
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Schneehöhe am Berg in dieser Saison">`;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Schneehöhe am Berg und im Tal in dieser Saison">`;
   for(let v = 0; v <= max; v += max / 2){ svg += `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${pl - 6}" y="${Y(v) + 3}" text-anchor="end">${v}</text>`; }
-  const hasB = pts.some(e => e.b > 0);
-  svg += `<path d="${line("m")}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>`;
-  if(hasB) svg += `<path d="${line("b")}" fill="none" stroke="var(--snow)" stroke-width="2"/>`;
+  for(const sr of series) svg += `<path d="${line(sr.key)}" fill="none" stroke="${sr.col}" stroke-width="${sr.rep ? 2 : 1.6}"${sr.rep ? "" : ' stroke-dasharray="4 3"'}/>`;
   const months = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
   for(let m = new Date(t0); m <= new Date(t0 + span); m = new Date(m.getFullYear(), m.getMonth() + 1, 1)){
     const first = new Date(m.getFullYear(), m.getMonth(), 1), d = first.getTime() < t0 ? new Date(t0) : first;
-    const iso = d.toLocaleDateString("sv-SE"); svg += `<text x="${Math.min(X(iso), W - pr - 12)}" y="${H - 6}">${months[d.getMonth()]}</text>`;
+    svg += `<text x="${Math.min(X(d.toLocaleDateString("sv-SE")), W - pr - 12)}" y="${H - 6}">${months[d.getMonth()]}</text>`;
   }
-  const last = pts[pts.length - 1];
   svg += `</svg>`;
-  return h + `<div class="pad">${svg}</div><div class="legend">${hasB ? `<span><i style="background:var(--snow)"></i>laut Skigebiet</span>` : ""}<span><i class="dash"></i>Modell</span><span>heute: ${cm(last.b ?? last.m)} cm</span></div></div>`;
+  const last = pts[pts.length - 1];
+  const legend = series.map(sr => `<span><i class="${sr.rep ? "solid" : "dash"}" style="--c:${sr.col}"></i>${sr.name} ${cm(last[sr.key])} cm</span>`).join("");
+  const src = series.every(sr => sr.rep) ? "laut Skigebiet" : series.every(sr => !sr.rep) ? "Modell (gestrichelt)" : "durchgezogen: Skigebiet · gestrichelt: Modell";
+  return h + `<div class="pad">${svg}</div><div class="legend">${legend}<span>${src}</span></div></div>`;
 }
 
 /* ---------- Farben ---------- */

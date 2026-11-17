@@ -7,8 +7,8 @@ import json, os, sys, urllib.request
 ROOT = os.path.join(os.path.dirname(__file__), "..")
 OUT = os.path.join(ROOT, "weather.json")
 
-HOURLY = "temperature_2m,snowfall,snow_depth,freezing_level_height,weather_code,wind_gusts_10m,cloud_cover"
-DAILY = "weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,sunshine_duration,wind_gusts_10m_max"
+HOURLY = "temperature_2m,snowfall,snow_depth,freezing_level_height,weather_code,wind_gusts_10m,cloud_cover,sunshine_duration,visibility,precipitation"
+DAILY = "weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,sunshine_duration,wind_gusts_10m_max,daylight_duration"
 CURRENT = "temperature_2m,weather_code,wind_gusts_10m,snowfall"
 
 
