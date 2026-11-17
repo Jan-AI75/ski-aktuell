@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ski aktuell</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ski">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0c1620" id="themeColor">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: eine Spalte fürs Handy — Gebietsauswahl, Übersicht aller Gebiete oder Detail eines Gebiets
+   (Neuschnee, Lawinenlage, Wetter je Höhe, 7-Tage-Vorhersage, Schneefall-Verlauf, Lifte & Pisten).
+   Farben: Paletten über data-palette am html-Element, Voreinstellung Gletscher (dunkel). */
+:root{
+  --bg:#0c1620; --surface:#122130; --fg:#e4edf3; --muted:#8aa0b2; --line:#22384a;
+  --accent:#7cc4ea; --accent-soft:#17324a; --snow:#cfe9f8; --up:#6cc890; --down:#ee8a72;
+  --warm:#f0a070; --cool:#8fbcf0; --statusbar:var(--bg);
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+:root[data-palette="graphit"]{--bg:#111316;--surface:#1a1d21;--fg:#e9ebee;--muted:#959ca6;--line:#2a2e34;--accent:#7fb4ff;--accent-soft:#1d2a3d;--snow:#dbe7ff;--statusbar:var(--bg)}
+:root[data-palette="schwarz"]{--bg:#000;--surface:#0e0f11;--fg:#f3f4f5;--muted:#8b9097;--line:#23262a;--accent:#5fb8f0;--accent-soft:#0f2236;--snow:#d6ecfa;--statusbar:#000}
+:root[data-palette="nacht"]{--bg:#000;--surface:#0A0404;--fg:#FF6A5C;--muted:#C2513F;--line:#2A0F0C;--accent:#E8604F;--accent-soft:#2A0806;--snow:#FF8A7C;--up:#FF6A5C;--down:#D5584B;--warm:#FF6A5C;--cool:#B44A3E;--statusbar:#000}
+:root[data-palette="hell"]{--bg:#eef3f6;--surface:#fff;--fg:#10283a;--muted:#5a7284;--line:#d3dee6;--accent:#1f6f9b;--accent-soft:#d3e7f3;--snow:#2a7fb0;--up:#2c7a4b;--down:#b4472f;--warm:#c2552f;--cool:#2f6fb4;--statusbar:#10283a;color-scheme:light}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--statusbar);z-index:10}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.45;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px;display:grid;gap:16px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(1.25rem,5.6vw,1.6rem);margin:0;letter-spacing:-.01em;white-space:nowrap}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hbtns{position:relative;display:flex;gap:8px;align-items:center}
+button.refresh{font:500 .8rem var(--body);color:var(--accent);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer}
+button.refresh[disabled]{opacity:.6}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pal-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;padding:0}
+.pal-dot{width:16px;height:16px;border-radius:50%;background:conic-gradient(var(--accent) 0 50%,var(--snow) 50% 75%,var(--muted) 75%)}
+.pal-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:20;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;min-width:190px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:grid;gap:2px}
+.pal-title{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 10px 4px}
+.pal-item{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:var(--fg);font:500 .9rem var(--body);padding:8px 10px;border-radius:9px;cursor:pointer;text-align:left}
+.pal-item[aria-checked="true"]{background:color-mix(in srgb,var(--accent) 16%,transparent)}
+.pal-item .sw{display:flex;border-radius:5px;overflow:hidden;border:1px solid var(--line);flex:none}
+.pal-item .sw i{width:12px;height:18px}
+/* Gebietsauswahl */
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-4px;padding:2px 4px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;font:600 .86rem var(--body);border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.status{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--up);flex:none}
+.status.stale .dot{background:var(--warm)}
+/* Karten */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.card h2{font-family:var(--display);font-weight:500;font-size:1.05rem;margin:0;padding:12px 16px 4px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card h2 small{font:400 .74rem var(--mono);color:var(--muted)}
+.card .note{font-size:.78rem;color:var(--muted);padding:8px 16px 12px;border-top:1px solid var(--line)}
+.card .pad{padding:4px 16px 14px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:11px 16px;border-top:1px solid var(--line)}
+.card h2 + .row{border-top:0}
+.row .lbl{font-weight:500;min-width:0}
+.row .lbl span{display:block;font-size:.78rem;color:var(--muted);font-weight:400}
+.row .v{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;font-weight:500;white-space:nowrap}
+.row .v small{display:block;font-size:.76rem;font-weight:400;color:var(--muted)}
+/* Hero */
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;gap:10px}
+.bigrow{display:flex;align-items:flex-end;gap:clamp(10px,3vw,16px)}
+.big{font-family:var(--display);font-weight:700;font-size:clamp(2.6rem,13vw,4rem);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em;color:var(--snow)}
+.big small{font-size:.3em;font-weight:500;color:var(--muted);margin-left:4px;letter-spacing:0}
+.fc{display:grid;gap:1px;padding:2px 0 6px clamp(10px,3vw,14px);border-left:1px solid var(--line);font-variant-numeric:tabular-nums;min-width:0}
+.fc .fl{font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)}
+.fc .fv{font:500 clamp(.95rem,4vw,1.12rem)/1.2 var(--mono);white-space:nowrap}
+.fc .fd{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:.8rem;font-weight:600;background:var(--accent-soft);color:var(--fg);width:fit-content}
+/* Lawine */
+.lv{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:7px;font:700 .9rem var(--mono);color:#111;flex:none}
+.lv1{background:#ccff66}.lv2{background:#ffff00}.lv3{background:#ff9900}.lv4{background:#ff3b30;color:#fff}.lv5{background:repeating-linear-gradient(45deg,#ff3b30 0 6px,#111 6px 12px);color:#fff}.lv0{background:var(--line);color:var(--muted)}
+.lawhead{display:flex;gap:12px;align-items:center;padding:6px 16px 12px}
+.lawhead b{display:block;font-weight:600}
+.lawhead span{font-size:.8rem;color:var(--muted)}
+.probs{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}
+.probs span{font-size:.78rem;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--fg)}
+.probs span em{font-style:normal;color:var(--muted);font-family:var(--mono);font-size:.72rem;margin-left:4px}
+/* Übersicht */
+.ov{display:grid;gap:10px}
+.ovc{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px 14px;cursor:pointer}
+.ovc .t{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ovc .t b{font-family:var(--display);font-weight:500;font-size:1.1rem}
+.ovc .t span.r{display:block;font-size:.76rem;color:var(--muted)}
+.ovc .t .lw{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.stats > div{border-left:1px solid var(--line);padding-left:10px;min-width:0}
+.stats > div:first-child{border-left:0;padding-left:0}
+.stats .fl{font-size:.64rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)}
+.stats .fv{font:500 1.15rem/1.2 var(--mono);font-variant-numeric:tabular-nums}
+.stats .fv.snow{color:var(--snow)}
+.stats .fd{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stats .fl{white-space:nowrap}
+/* 7 Tage */
+.day{display:grid;grid-template-columns:4.2em minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.card h2 + .day{border-top:0}
+.day .d{font-weight:600}
+.day .d span{display:block;font:400 .72rem var(--mono);color:var(--muted)}
+.day .w{font-size:.84rem;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.day .w span{display:block;font:400 .72rem var(--mono);overflow:hidden;text-overflow:ellipsis}
+.day .s{font:500 .95rem var(--mono);color:var(--snow);text-align:right;min-width:4.2ch}
+.day .s.z{color:var(--muted);opacity:.6}
+.day .t{font:400 .84rem var(--mono);text-align:right;white-space:nowrap}
+.day .t i{font-style:normal;color:var(--muted)}
+.day.today{background:color-mix(in srgb,var(--accent) 7%,transparent)}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--mono);font-size:10px;fill:var(--muted)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;padding:0 16px 12px;font-size:.76rem;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:10px;border-radius:2px;vertical-align:middle;margin-right:6px}
+a.btn{display:inline-flex;align-items:center;gap:6px;font:600 .86rem var(--body);color:var(--accent);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:8px 14px}
+.best{margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted)}
+.best b{color:var(--accent);font-weight:600}
+.day .w b{color:var(--accent);font-weight:600}
+.day.bestday{box-shadow:inset 3px 0 0 var(--accent)}
+details summary .cnt{float:right;color:var(--muted);font:400 .78rem var(--mono)}
+.item i{font-style:normal;color:var(--muted);font-size:.74rem;margin-left:8px}
+details summary{cursor:pointer;padding:10px 16px;border-top:1px solid var(--line);font-size:.86rem;color:var(--accent);list-style:none}
+details summary::-webkit-details-marker{display:none}
+.item{display:flex;justify-content:space-between;gap:10px;padding:7px 16px;font-size:.86rem;border-top:1px solid var(--line)}
+.item .o{font:500 .78rem var(--mono)}.item .o.y{color:var(--up)}.item .o.n{color:var(--muted)}
+[hidden]{display:none!important}
+footer{font-size:.75rem;color:var(--muted);line-height:1.5}
+footer a{color:var(--accent)}
+.empty{padding:28px 16px;text-align:center;color:var(--muted)}
+</style>
+<script>
+  (function(){ var p = "gletscher"; try{ p = localStorage.getItem("ski-palette") || p; }catch(e){}
+    if(p !== "gletscher") document.documentElement.setAttribute("data-palette", p); })();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow" id="eyebrow">Skigebiete</div>
+      <h1>Ski aktuell</h1>
+    </div>
+    <div class="hbtns">
+      <button class="refresh" id="refresh" type="button">Aktualisieren</button>
+      <button class="pal-btn" id="palBtn" type="button" aria-label="Farben" aria-haspopup="true" aria-expanded="false"><span class="pal-dot"></span></button>
+      <div class="pal-menu" id="palMenu" role="menu" hidden></div>
+    </div>
+  </header>
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+  <div class="status" id="status"><span class="dot"></span><span id="statusText">Lädt …</span></div>
+  <main id="main" class="ov"></main>
+  <footer id="footer">
+    Wetter, Neuschnee und Schneehöhe: <a href="https://open-meteo.com" rel="noopener">Open-Meteo</a> (Modellwerte, je Höhe berechnet).
+    Lawinenlage: <a href="https://warnung.vorarlberg.at/vtgdb/dist/index.html#//lwd_lagebericht.html" rel="noopener">LWD Vorarlberg</a>.
+    Lifte und Pisten: Angaben der Skigebiete. Alle Angaben ohne Gewähr – vor Touren abseits der Piste immer den vollständigen Lagebericht lesen.
+  </footer>
+</div>
+<script>
+"use strict";
+/* ---------- Grundlagen ---------- */
+const HOURLY = "temperature_2m,snowfall,snow_depth,freezing_level_height,weather_code,wind_gusts_10m,cloud_cover";
+const DAILY = "weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,precipitation_sum,sunshine_duration,wind_gusts_10m_max";
+const CURRENT = "temperature_2m,weather_code,wind_gusts_10m,snowfall";
+const PALETTES = [
+  ["gletscher","Gletscher",["#0c1620","#7cc4ea","#cfe9f8"]],
+  ["graphit","Graphit",["#111316","#7fb4ff","#dbe7ff"]],
+  ["schwarz","Schwarz",["#000000","#5fb8f0","#d6ecfa"]],
+  ["nacht","Nachtsicht (rot)",["#000000","#E8604F","#FF8A7C"]],
+  ["hell","Hell",["#eef3f6","#1f6f9b","#10283a"]],
+];
+const LEVEL = {low:1, moderate:2, considerable:3, high:4, very_high:5};
+const LEVEL_TXT = ["keine Einstufung","gering","mäßig","erheblich","groß","sehr groß"];
+const PROBLEM = {new_snow:"Neuschnee", wind_slab:"Triebschnee", persistent_weak_layers:"Altschnee", wet_snow:"Nassschnee",
+  gliding_snow:"Gleitschnee", cornices:"Wechten", favourable_situation:"Günstige Situation", no_distinct_avalanche_problem:"Kein ausgeprägtes Problem"};
+const TEND = {increasing:"steigend", steady:"gleichbleibend", decreasing:"abnehmend"};
+const PERIOD = {earlier:"vormittags", later:"nachmittags"};
+const ASPECTS = ["N","NE","E","SE","S","SW","W","NW"];
+const ASP_DE = {N:"N",NE:"NO",E:"O",SE:"SO",S:"S",SW:"SW",W:"W",NW:"NW"};
+const WD = ["So","Mo","Di","Mi","Do","Fr","Sa"];
+const REGION_DE = {"AT-08-01":"Bregenzerwaldgebirge","AT-08-02":"Allgäuer Alpen West","AT-08-03-01":"Lechtaler Alpen Vorarlberg",
+  "AT-08-03-02":"Lechquellengebirge","AT-08-04":"Verwall West","AT-08-05-01":"Rätikon Ost","AT-08-05-02":"Rätikon West","AT-08-06":"Silvretta West","AT-08-07":"Voralpen"};
+
+let RES = [], WX = null, WX_LIVE = false, LAW = null, STAT = null, HIST = null, VIEW = "overview";
+const $ = id => document.getElementById(id);
+function load(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
+function save(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function esc(s){ return String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+const fmt0 = v => (v == null || !isFinite(v)) ? "–" : Math.round(v).toString();
+const fmtT = v => (v == null || !isFinite(v)) ? "–" : (Math.round(v) === 0 ? "0" : Math.round(v).toString().replace("-", "−")) + "°";
+const cm = v => (v == null || !isFinite(v)) ? "–" : (v > 0 && v < 1 ? "<1" : Math.round(v).toString());
+
+function wxText(c){
+  if(c == null) return "–";
+  if(c === 0) return "Klar"; if(c === 1) return "Überwiegend klar"; if(c === 2) return "Teils bewölkt"; if(c === 3) return "Bedeckt";
+  if(c === 45 || c === 48) return "Nebel"; if(c >= 51 && c <= 57) return "Nieselregen";
+  if(c === 61) return "Leichter Regen"; if(c === 63) return "Regen"; if(c === 65) return "Starker Regen"; if(c === 66 || c === 67) return "Gefrierender Regen";
+  if(c === 71) return "Leichter Schneefall"; if(c === 73) return "Schneefall"; if(c === 75) return "Starker Schneefall"; if(c === 77) return "Schneegriesel";
+  if(c >= 80 && c <= 82) return "Regenschauer"; if(c === 85) return "Schneeschauer"; if(c === 86) return "Starke Schneeschauer";
+  if(c >= 95) return "Gewitter"; return "–";
+}
+
+/* ---------- Daten je Messpunkt ---------- */
+function activeResorts(){ return RES.filter(r => r.aktiv !== false); }
+function allPoints(){ return activeResorts().flatMap(r => r.points); }
+function apiUrl(){
+  const p = allPoints(), j = k => p.map(x => x[k]).join(",");
+  return "https://api.open-meteo.com/v1/forecast?latitude=" + j("lat") + "&longitude=" + j("lon") + "&elevation=" + j("elev") +
+    "&current=" + CURRENT + "&hourly=" + HOURLY + "&daily=" + DAILY + "&past_days=7&forecast_days=7&timezone=Europe%2FBerlin&wind_speed_unit=kmh";
+}
+function pointData(r, i){
+  if(!WX) return null;
+  let k = 0;
+  for(const x of activeResorts()){ if(x === r) return WX[k + i] || null; k += x.points.length; }
+  return null;
+}
+function nowIdx(d){
+  const key = d.current.time.slice(0,13) + ":00", t = d.hourly.time;
+  let i = t.indexOf(key);
+  if(i < 0){ i = 0; while(i + 1 < t.length && t[i+1] <= d.current.time) i++; }
+  return i;
+}
+function sumSnow(d, from, to){
+  let s = 0; const a = d.hourly.snowfall;
+  for(let i = Math.max(0, from); i <= Math.min(a.length - 1, to); i++) s += a[i] || 0;
+  return s;
+}
+function pointStats(d){
+  if(!d || !d.current || !d.hourly) return null;
+  const i = nowIdx(d), h = d.hourly;
+  const di = d.daily.time.indexOf(d.current.time.slice(0,10));
+  return {
+    i, di,
+    temp: d.current.temperature_2m, code: d.current.weather_code, gust: d.current.wind_gusts_10m,
+    past24: sumSnow(d, i-23, i), past72: sumSnow(d, i-71, i),
+    next24: sumSnow(d, i+1, i+24), next72: sumSnow(d, i+1, i+72),
+    depth: h.snow_depth[i] != null ? h.snow_depth[i] * 100 : null,
+    freezing: h.freezing_level_height[i],
+  };
+}
+
+/* ---------- Bester Skitag ----------
+   Punkte je Tag (heute bis +6): frischer Schnee vom Vortag und der Nacht (bis 45), Sonnenstunden (bis 35),
+   wenig Wind (bis 20, starke Böen kosten Punkte), Abzug für Dauerschneefall, große Kälte und Lawinenstufe ≥ 4.
+   Nur Tage mit genug Schnee am Berg (Modell ≥ 30 cm oder offene Lifte laut Skigebiet) zählen.
+   Markiert wird der beste Tag, wenn er mindestens 50 Punkte erreicht. */
+function bestDay(r){
+  const top = r.points.length - 1, d = pointData(r, top), s = pointStats(d);
+  if(!s || s.di < 1) return null;
+  const D = d.daily, H = d.hourly, st = STAT && STAT[r.id];
+  const liftsOpen = st && st.lifts && st.lifts.open > 0;
+  let best = null;
+  for(let k = s.di; k < Math.min(D.time.length, s.di + 7); k++){
+    const hi = H.time.indexOf(D.time[k] + "T12:00"), depth = hi >= 0 ? (H.snow_depth[hi] || 0) * 100 : 0;
+    if(depth < 30 && !(k === s.di && liftsOpen)) continue;
+    const fresh = (D.snowfall_sum[k-1] || 0) + 0.5 * (D.snowfall_sum[k] || 0);
+    const sun = (D.sunshine_duration[k] || 0) / 3600, gust = D.wind_gusts_10m_max[k] || 0;
+    let p = Math.min(fresh, 30) / 30 * 45 + Math.min(sun, 8) / 8 * 35 + (gust < 40 ? 20 : gust < 60 ? 10 : gust < 80 ? -10 : -30);
+    if((D.snowfall_sum[k] || 0) > 15) p -= 10;
+    if((D.temperature_2m_max[k] ?? 0) < -15) p -= 5;
+    const L = lawFor(r, D.time[k]); if(L && L.lv >= 4) p -= 15;
+    if(!best || p > best.p) best = {k, p};
+  }
+  if(!best || best.p < 50) return null;
+  const dt = new Date(D.time[best.k] + "T12:00:00");
+  best.label = best.k === s.di ? "heute" : best.k === s.di + 1 ? "morgen" : WD[dt.getDay()] + " " + dt.getDate() + "." + (dt.getMonth()+1) + ".";
+  return best;
+}
+
+/* ---------- Lawinenlage ---------- */
+function todayStr(){ return new Date().toLocaleDateString("sv-SE", {timeZone:"Europe/Vienna"}); }
+function lawFor(r, day){
+  if(!LAW || !LAW.days || !r.lawine || !r.lawine.length) return null;
+  const regions = LAW.days[day]; if(!regions) return null;
+  let best = null;
+  for(const want of r.lawine){
+    for(const [id, e] of Object.entries(regions)){
+      if(id !== want && !id.startsWith(want + "-")) continue;
+      const lv = maxLevel(e);
+      if(!best || lv > best.lv) best = {lv, e, id};
+    }
+  }
+  return best;
+}
+function maxLevel(e){ return Math.max(0, ...e.ratings.map(x => LEVEL[x.value] || 0)); }
+function elevTxt(el){
+  if(!el) return "";
+  if(el.lowerBound) return "über " + (el.lowerBound === "treeline" ? "der Waldgrenze" : el.lowerBound + " m");
+  if(el.upperBound) return "unter " + (el.upperBound === "treeline" ? "der Waldgrenze" : el.upperBound + " m");
+  return "";
+}
+function ratingDetail(e){
+  const rs = e.ratings.filter(x => LEVEL[x.value]);
+  if(rs.length <= 1) return "";
+  return rs.map(x => [PERIOD[x.period], elevTxt(x.elevation)].filter(Boolean).join(", ") + ": " + LEVEL[x.value] + " " + LEVEL_TXT[LEVEL[x.value]]).join(" · ");
+}
+
+/* ---------- Darstellung ---------- */
+function setView(v){
+  VIEW = v; save("ski-view", v);
+  try{ history.replaceState(null, "", v === "overview" ? location.pathname + location.search : "#" + v); }catch(e){}
+  render(); window.scrollTo({top:0});
+}
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if(h && h !== VIEW){ VIEW = h; render(); } });
+function renderTabs(){
+  const items = [["overview","Übersicht"], ...activeResorts().map(r => [r.id, r.name])];
+  $("tabs").innerHTML = items.map(([id, n]) => `<button type="button" role="tab" data-v="${esc(id)}" aria-selected="${id === VIEW}">${esc(n)}</button>`).join("");
+  $("tabs").querySelectorAll("button").forEach(b => b.onclick = () => setView(b.dataset.v));
+  const sel = $("tabs").querySelector('[aria-selected="true"]'); if(sel) sel.scrollIntoView({block:"nearest", inline:"nearest"});
+}
+function render(){
+  if(VIEW !== "overview" && !activeResorts().some(r => r.id === VIEW)) VIEW = "overview";
+  renderTabs();
+  $("main").innerHTML = VIEW === "overview" ? overviewHTML() : resortHTML(activeResorts().find(r => r.id === VIEW));
+  $("main").querySelectorAll("[data-go]").forEach(b => b.onclick = () => setView(b.dataset.go));
+  const first = WX && WX[0] && WX[0].current;
+  $("eyebrow").textContent = first ? "Stand " + first.time.slice(11,16) + " Uhr" : "Skigebiete";
+}
+function lawBadge(r){
+  const L = lawFor(r, todayStr());
+  if(!L) return `<span class="lv lv0" title="Kein Lagebericht">–</span>`;
+  return `<span class="lv lv${L.lv}" title="Lawinenwarnstufe ${L.lv} ${LEVEL_TXT[L.lv]}">${L.lv || "–"}</span>`;
+}
+function liftLine(r){
+  const st = STAT && STAT[r.id];
+  return st && st.lifts && st.lifts.total ? "Lifte " + fmt0(st.lifts.open) + "/" + fmt0(st.lifts.total) : "";
+}
+function reported(r){
+  const st = STAT && STAT[r.id];
+  return st && st.snow && st.snow.mountain > 0 ? st.snow : null;
+}
+function depthCell(r, berg){
+  const rep = reported(r);
+  if(rep) return `<div><div class="fl">Schneehöhe</div><div class="fv">${cm(rep.mountain)}<small> cm</small></div><div class="fd">laut Skigebiet</div></div>`;
+  return `<div><div class="fl">Schneehöhe</div><div class="fv">${berg ? cm(berg.depth) : "–"}<small> cm</small></div><div class="fd">Modell, Berg</div></div>`;
+}
+function overviewHTML(){
+  if(!WX) return `<div class="card"><div class="empty">Daten werden geladen …</div></div>`;
+  return activeResorts().map(r => {
+    const berg = pointStats(pointData(r, r.points.length - 1));
+    const top = r.points[r.points.length - 1];
+    return `<button type="button" class="ovc" data-go="${esc(r.id)}">
+      <div class="t"><div><b>${esc(r.name)}</b><span class="r">${esc(r.region || "")} · ${liftLine(r) || "Berg " + top.elev + " m"} · ${berg ? fmtT(berg.temp) + " " + wxText(berg.code) : "–"}</span></div>
+        <div class="lw">Lawine ${lawBadge(r)}</div></div>
+      <div class="stats">
+        <div><div class="fl">Neuschnee</div><div class="fv snow">${berg ? cm(berg.past24) : "–"}<small> cm</small></div><div class="fd">24 h · 72 h: ${berg ? cm(berg.past72) : "–"}</div></div>
+        <div><div class="fl">Prognose</div><div class="fv">${berg ? "+" + cm(berg.next72) : "–"}<small> cm</small></div><div class="fd">nächste 3 Tage</div></div>
+        ${depthCell(r, berg)}
+      </div>
+      ${(() => { const b = bestDay(r); return b ? `<div class="best">Bester Skitag: <b>${b.label}</b></div>` : ""; })()}
+    </button>`;
+  }).join("") + `<p class="status" style="margin:2px 2px 0">Neuschnee und Prognose sind Modellwerte für die Höhe der Bergstation. Antippen für Details.</p>`;
+}
+function resortHTML(r){
+  const top = r.points.length - 1, P = r.points[top];
+  const d = pointData(r, top), s = pointStats(d);
+  if(!s) return `<div class="card"><div class="empty">Daten werden geladen …</div></div>`;
+  const snowline = s.freezing != null ? Math.round(Math.max(0, s.freezing - 300) / 50) * 50 : null;
+  let h = `<section class="hero">
+    <div class="eyebrow">Neuschnee 24 h · ${esc(P.name)} ${P.elev} m</div>
+    <div class="bigrow">
+      <div class="big">${cm(s.past24)}<small>cm</small></div>
+      <div class="fc"><span class="fl">Nächste 3 Tage</span><span class="fv">+${cm(s.next72)} cm</span><span class="fd">morgen +${cm(s.next24)} cm</span></div>
+      ${(() => { const rp = reported(r); return `<div class="fc"><span class="fl">Schneehöhe</span><span class="fv">${cm(rp ? rp.mountain : s.depth)} cm</span><span class="fd">${rp ? "laut Skigebiet" : "Modellwert"}</span></div>`; })()}
+    </div>
+    <span class="pill">${fmtT(s.temp)} · ${wxText(s.code)}${snowline != null ? " · Schneefallgrenze ~" + snowline + " m" : ""}</span>
+  </section>`;
+  h += lawineHTML(r);
+  h += `<div class="card"><h2>Jetzt <small>nach Höhe</small></h2>` + r.points.map((p, i) => {
+    const q = pointStats(pointData(r, i)); if(!q) return "";
+    return `<div class="row"><div class="lbl">${esc(p.name)}<span>${p.elev} m · ${wxText(q.code)}</span></div>
+      <div class="v">${fmtT(q.temp)}<small>Böen ${fmt0(q.gust)} km/h</small></div>
+      <div class="v">${cm(q.depth)} cm<small>Schnee</small></div></div>`;
+  }).join("") + `</div>`;
+  h += daysHTML(r, d, s);
+  h += chartHTML(d, s);
+  h += liftsHTML(r);
+  h += seasonHTML(r);
+  return h;
+}
+function lawineHTML(r){
+  const today = todayStr(), L = lawFor(r, today);
+  let h = `<div class="card"><h2>Lawinenlage <small>LWD Vorarlberg</small></h2>`;
+  if(!r.lawine || !r.lawine.length){
+    return h + `<div class="note" style="border-top:0">Für dieses Gebiet ist keine Lawinenwarnregion hinterlegt.</div></div>`;
+  }
+  if(!L){
+    return h + `<div class="note" style="border-top:0">Noch kein Lagebericht für heute. Der Lawinenwarndienst veröffentlicht ihn während der Wintersaison täglich.</div></div>`;
+  }
+  const det = ratingDetail(L.e);
+  h += `<div class="lawhead"><span class="lv lv${L.lv}">${L.lv || "–"}</span><div><b>Stufe ${L.lv} – ${LEVEL_TXT[L.lv]}</b><span>${esc(det || REGION_DE[L.id] || L.e.name || L.id)}</span></div></div>`;
+  const probs = L.e.problems.filter(p => PROBLEM[p.type]);
+  if(probs.length) h += `<div class="probs">` + probs.map(p => {
+    const asp = (p.aspects || []).slice().sort((a,b) => ASPECTS.indexOf(a) - ASPECTS.indexOf(b)).map(a => ASP_DE[a] || a).join(" ");
+    const extra = [elevTxt(p.elevation), asp].filter(Boolean).join(" · ");
+    return `<span>${PROBLEM[p.type]}${extra ? `<em>${esc(extra)}</em>` : ""}</span>`;
+  }).join("") + `</div>`;
+  const tomorrow = new Date(Date.now() + 864e5).toLocaleDateString("sv-SE", {timeZone:"Europe/Vienna"});
+  const T = lawFor(r, tomorrow);
+  const tend = L.e.tendency && L.e.tendency[0] ? "Tendenz " + TEND[L.e.tendency[0]] : "";
+  const note = [T ? "Morgen: Stufe " + T.lv + " – " + LEVEL_TXT[T.lv] : tend].filter(Boolean).join(" · ");
+  h += `<div class="note">${esc(note || "")}${note ? " · " : ""}<a href="https://warnung.vorarlberg.at/vtgdb/dist/index.html#//lwd_lagebericht.html" rel="noopener" style="color:var(--accent)">Ganzer Bericht ↗</a></div></div>`;
+  return h;
+}
+function daysHTML(r, d, s){
+  const D = d.daily, tal = pointData(r, 0), B = bestDay(r);
+  let h = `<div class="card"><h2>7 Tage <small>Berg · Neuschnee · Temperatur</small></h2>`;
+  for(let k = Math.max(0, s.di); k < D.time.length && k < s.di + 7; k++){
+    const dt = new Date(D.time[k] + "T12:00:00");
+    const name = k === s.di ? "Heute" : k === s.di + 1 ? "Morgen" : WD[dt.getDay()];
+    const sn = D.snowfall_sum[k], sun = D.sunshine_duration[k] != null ? Math.round(D.sunshine_duration[k] / 3600) : null;
+    const talMax = tal && tal.daily ? tal.daily.temperature_2m_max[k] : null;
+    const isBest = B && B.k === k;
+    h += `<div class="day${k === s.di ? " today" : ""}${isBest ? " bestday" : ""}">
+      <div class="d">${name}<span>${dt.getDate()}.${dt.getMonth()+1}.</span></div>
+      <div class="w">${wxText(D.weather_code[k])}<span>${isBest ? "<b>Bester Tag</b> · " : ""}${sun != null ? sun + " h Sonne" : ""}</span></div>
+      <div class="s${sn >= 0.5 ? "" : " z"}">${sn >= 0.5 ? "+" + cm(sn) : "0"}</div>
+      <div class="t">${fmtT(D.temperature_2m_min[k])} / ${fmtT(D.temperature_2m_max[k])}${talMax != null && r.points.length > 1 ? `<br><i>Tal ${fmtT(talMax)}</i>` : ""}</div>
+    </div>`;
+  }
+  return h + `<div class="note">Neuschnee in cm am Berg, Temperatur am Berg (min / max), darunter Höchstwert im Tal.${B ? " „Bester Tag“: frischer Schnee, viel Sonne, wenig Wind." : ""}</div></div>`;
+}
+function chartHTML(d, s){
+  const D = d.daily, from = Math.max(0, s.di - 7), n = D.time.length - from;
+  const vals = D.snowfall_sum.slice(from), W = 340, H = 140, padB = 20, padT = 16;
+  const max = Math.max(10, ...vals.map(v => v || 0)), bw = W / n;
+  const Y = v => H - padB - (v / max) * (H - padB - padT);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Neuschnee pro Tag, letzte und nächste Woche">`;
+  svg += `<line x1="0" x2="${W}" y1="${H - padB}" y2="${H - padB}" stroke="var(--line)"/>`;
+  vals.forEach((v, j) => {
+    const k = from + j, x = j * bw + bw * 0.18, w = bw * 0.64, past = k < s.di, today = k === s.di;
+    const y = Y(v || 0), hh = H - padB - y;
+    if(hh > 0) svg += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${hh.toFixed(1)}" rx="2" fill="${past ? "var(--muted)" : "var(--snow)"}" opacity="${past ? .45 : today ? 1 : .8}"/>`;
+    if(v >= 1) svg += `<text x="${(x + w/2).toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" fill="var(--fg)">${Math.round(v)}</text>`;
+    const dt = new Date(D.time[k] + "T12:00:00");
+    svg += `<text x="${(x + w/2).toFixed(1)}" y="${H - 6}" text-anchor="middle"${today ? ' fill="var(--accent)" font-weight="600"' : ""}>${today ? "heute" : WD[dt.getDay()].slice(0,2)}</text>`;
+  });
+  svg += `</svg>`;
+  return `<div class="card"><h2>Schneefall <small>Berg · cm pro Tag</small></h2><div class="pad">${svg}</div>
+    <div class="legend"><span><i style="background:var(--muted);opacity:.45"></i>letzte 7 Tage</span><span><i style="background:var(--snow)"></i>Vorhersage</span></div></div>`;
+}
+function liftsHTML(r){
+  const st = STAT && STAT[r.id];
+  const link = `<a class="btn" href="${esc(r.live || r.web)}" rel="noopener">Live-Info des Skigebiets ↗</a>`;
+  if(!st) return `<div class="card"><h2>Lifte &amp; Pisten</h2><div class="note" style="border-top:0">Noch keine Daten vom Skigebiet.</div><div class="pad">${link}</div></div>`;
+  const when = st.updated ? new Date(st.updated).toLocaleString("de-DE",{day:"numeric",month:"numeric",hour:"2-digit",minute:"2-digit"}) : "";
+  let h = `<div class="card"><h2>Lifte &amp; Pisten <small>${esc(when)}</small></h2>`;
+  if(st.lifts) h += `<div class="row"><div class="lbl">Lifte offen</div><div></div><div class="v">${fmt0(st.lifts.open)} / ${fmt0(st.lifts.total)}</div></div>`;
+  if(st.slopes) h += `<div class="row"><div class="lbl">Pisten offen</div><div></div><div class="v">${fmt0(st.slopes.open)} / ${fmt0(st.slopes.total)} ${esc(st.slopes.unit || "")}</div></div>`;
+  if(st.valley_run) h += `<div class="row"><div class="lbl">Talabfahrt</div><div></div><div class="v">${esc(st.valley_run)}</div></div>`;
+  const sn = st.snow || {};
+  if(sn.mountain != null || sn.valley != null){
+    h += `<div class="row"><div class="lbl">Schneehöhe laut Skigebiet<span>${esc([st.condition, st.last_snowfall ? "letzter Schneefall: " + st.last_snowfall : ""].filter(Boolean).join(" · "))}</span></div>
+      <div class="v">${sn.valley != null ? cm(sn.valley) + " cm" : "–"}<small>Tal</small></div><div class="v">${sn.mountain != null ? cm(sn.mountain) + " cm" : "–"}<small>Berg</small></div></div>`;
+  }
+  const groups = [["lift","Lifte"],["piste","Pisten"],["route","Skirouten"]];
+  for(const [kind, title] of groups){
+    const its = (st.items || []).filter(i => i.kind === kind);
+    if(!its.length) continue;
+    const open = its.filter(i => i.open === true).length, known = its.some(i => i.open != null);
+    h += `<details><summary>${title} <span class="cnt">${known ? open + " von " + its.length + " offen" : its.length}</span></summary>` +
+      its.slice().sort((a,b) => (b.open === true) - (a.open === true)).map(it =>
+        `<div class="item"><span>${esc(it.name)}${it.type ? `<i>${esc(it.type)}</i>` : ""}</span><span class="o ${it.open ? "y" : "n"}">${it.open === true ? "offen" : it.open === false ? (it.state && !/^geschlossen$/i.test(it.state) ? esc(it.state) : "zu") : "–"}</span></div>`).join("") + `</details>`;
+  }
+  return h + `<div class="note">${link}</div></div>`;
+}
+function seasonHTML(r){
+  const all = HIST && HIST.resorts && HIST.resorts[r.id] || [];
+  const t = new Date(), y = t.getMonth() >= 8 ? t.getFullYear() : t.getFullYear() - 1;
+  const pts = all.filter(e => e.d >= y + "-10-01");
+  let h = `<div class="card"><h2>Saisonverlauf <small>Schneehöhe Berg</small></h2>`;
+  if(pts.length < 2) return h + `<div class="note" style="border-top:0">Der Verlauf füllt sich ab jetzt täglich.</div></div>`;
+  const W = 340, H = 150, pl = 30, pr = 8, pt = 10, pb = 22;
+  const t0 = Date.parse(pts[0].d), t1 = Date.parse(pts[pts.length-1].d), span = Math.max(t1 - t0, 864e5 * 6);
+  const vals = pts.flatMap(e => [e.m, e.b].filter(v => v != null));
+  const max = Math.max(50, Math.ceil(Math.max(...vals) / 50) * 50);
+  const X = d => pl + (Date.parse(d) - t0) / span * (W - pl - pr), Y = v => H - pb - v / max * (H - pt - pb);
+  const line = key => { let path = "", pen = false; for(const e of pts){ if(e[key] == null){ pen = false; continue; } path += (pen ? "L" : "M") + X(e.d).toFixed(1) + " " + Y(e[key]).toFixed(1); pen = true; } return path; };
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Schneehöhe am Berg in dieser Saison">`;
+  for(let v = 0; v <= max; v += max / 2){ svg += `<line x1="${pl}" x2="${W - pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--line)"/><text x="${pl - 6}" y="${Y(v) + 3}" text-anchor="end">${v}</text>`; }
+  const hasB = pts.some(e => e.b != null);
+  svg += `<path d="${line("m")}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="4 3"/>`;
+  if(hasB) svg += `<path d="${line("b")}" fill="none" stroke="var(--snow)" stroke-width="2"/>`;
+  const months = ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+  for(let m = new Date(t0); m <= new Date(t0 + span); m = new Date(m.getFullYear(), m.getMonth() + 1, 1)){
+    const first = new Date(m.getFullYear(), m.getMonth(), 1), d = first.getTime() < t0 ? new Date(t0) : first;
+    const iso = d.toLocaleDateString("sv-SE"); svg += `<text x="${Math.min(X(iso), W - pr - 12)}" y="${H - 6}">${months[d.getMonth()]}</text>`;
+  }
+  const last = pts[pts.length - 1];
+  svg += `</svg>`;
+  return h + `<div class="pad">${svg}</div><div class="legend">${hasB ? `<span><i style="background:var(--snow)"></i>laut Skigebiet</span>` : ""}<span><i style="background:var(--muted)"></i>Modell</span><span>heute: ${cm(last.b ?? last.m)} cm</span></div></div>`;
+}
+
+/* ---------- Farben ---------- */
+function buildPalette(){
+  const cur = document.documentElement.getAttribute("data-palette") || "gletscher";
+  $("palMenu").innerHTML = `<div class="pal-title">Farben</div>` + PALETTES.map(([id, n, c]) =>
+    `<button type="button" class="pal-item" role="menuitemradio" data-p="${id}" aria-checked="${id === cur}"><span class="sw">${c.map(x => `<i style="background:${x}"></i>`).join("")}</span>${n}</button>`).join("");
+  $("palMenu").querySelectorAll(".pal-item").forEach(b => b.onclick = () => {
+    const p = b.dataset.p;
+    if(p === "gletscher") document.documentElement.removeAttribute("data-palette"); else document.documentElement.setAttribute("data-palette", p);
+    try{ localStorage.setItem("ski-palette", p); }catch(e){}
+    $("themeColor").setAttribute("content", getComputedStyle(document.documentElement).getPropertyValue("--bg").trim());
+    buildPalette(); toggleMenu(false);
+  });
+}
+function toggleMenu(open){ $("palMenu").hidden = !open; $("palBtn").setAttribute("aria-expanded", open); }
+$("palBtn").onclick = e => { e.stopPropagation(); toggleMenu($("palMenu").hidden); };
+document.addEventListener("click", e => { if(!$("palMenu").contains(e.target)) toggleMenu(false); });
+
+/* ---------- Laden ---------- */
+async function getJSON(url, ms = 15000){
+  const ctrl = new AbortController(), to = setTimeout(() => ctrl.abort(), ms);
+  try{ const r = await fetch(url, {signal: ctrl.signal, cache: "no-store"}); if(!r.ok) throw new Error("HTTP " + r.status); return await r.json(); }
+  finally{ clearTimeout(to); }
+}
+const valid = w => Array.isArray(w) && w.length === allPoints().length && w.every(x => x && x.current && x.hourly && x.daily);
+async function refresh(){
+  $("refresh").disabled = true;
+  try{
+    const cfg = await getJSON("resorts.json?t=" + Date.now());
+    RES = cfg.resorts || []; save("ski-resorts", RES);
+  }catch(e){ RES = load("ski-resorts") || RES; }
+  const [w, l, st, hi] = await Promise.allSettled([
+    (async () => { try{ let x = await getJSON(apiUrl()); if(!Array.isArray(x)) x = [x]; if(valid(x)) return {x, live:true}; }catch(e){}
+                   const f = await getJSON("weather.json?t=" + Date.now()); if(valid(f)) return {x:f, live:false}; throw new Error("kein Wetter"); })(),
+    getJSON("lawine.json?t=" + Date.now()),
+    getJSON("status.json?t=" + Date.now()),
+    getJSON("history.json?t=" + Date.now()),
+  ]);
+  if(w.status === "fulfilled"){ WX = w.value.x; WX_LIVE = w.value.live; save("ski-wx", WX); }
+  else { const c = load("ski-wx"); WX = valid(c) ? c : null; WX_LIVE = false; }
+  if(l.status === "fulfilled"){ LAW = l.value; save("ski-law", LAW); } else LAW = load("ski-law");
+  if(st.status === "fulfilled"){ STAT = st.value; save("ski-stat", STAT); } else STAT = load("ski-stat");
+  if(hi.status === "fulfilled"){ HIST = hi.value; save("ski-hist", HIST); } else HIST = load("ski-hist");
+  const ok = !!WX && WX_LIVE;
+  $("status").classList.toggle("stale", !ok);
+  $("statusText").textContent = !WX ? "Keine Daten erreichbar" :
+    (WX_LIVE ? "Live · aktualisiert " : "Gespeicherte Daten · ") + new Date().toLocaleTimeString("de-DE", {hour:"2-digit", minute:"2-digit"}) + " Uhr";
+  render();
+  $("refresh").disabled = false;
+}
+$("refresh").onclick = refresh;
+VIEW = location.hash.slice(1) || load("ski-view") || "overview";
+RES = load("ski-resorts") || [];
+buildPalette();
+refresh();
+setInterval(() => { if(document.visibilityState === "visible") refresh(); }, 15 * 60 * 1000);
+document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") refresh(); });
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>

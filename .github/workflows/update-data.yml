@@ -1,0 +1,34 @@
+name: Skidaten aktualisieren
+on:
+  schedule:
+    - cron: "13,43 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: data-commit
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wetter, Neuschnee, Schneehöhe (Open-Meteo)
+        continue-on-error: true
+        run: python3 scripts/update_weather.py
+      - name: Lawinenlage (LWD Vorarlberg)
+        continue-on-error: true
+        run: python3 scripts/update_lawine.py
+      - name: Lifte, Pisten, Schneebericht (Skigebiete)
+        continue-on-error: true
+        run: python3 scripts/update_status.py
+      - name: Saisonverlauf
+        continue-on-error: true
+        run: python3 scripts/update_history.py
+      - name: Speichern
+        run: |
+          git config user.name "ski-bot"
+          git config user.email "ski-bot@users.noreply.github.com"
+          touch history.json
+          git add weather.json lawine.json status.json history.json
+          git diff --cached --quiet || (git commit -m "Daten $(date -u +%FT%TZ)" && git pull --rebase -q && git push)

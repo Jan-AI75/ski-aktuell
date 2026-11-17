@@ -1,0 +1,16 @@
+{
+  "name": "Ski aktuell",
+  "short_name": "Ski",
+  "description": "Wetter, Neuschnee, Schneehöhe, Lawinenlage und Lifte für ausgewählte Skigebiete",
+  "lang": "de",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0c1620",
+  "theme_color": "#0c1620",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
