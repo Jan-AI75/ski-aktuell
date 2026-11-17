@@ -204,15 +204,17 @@ def micado(cfg):
         "valley_run": props.get("skirun-status"),
         "items": items if trust else [dict(i, open=None) for i in items],
         "source": cfg["basis"].split("//")[1],
+        "reported": (fac.get("meta") or {}).get("lastUpdate") or None,
     }
 
 
 # ---------- Diedamskopf ----------
 def diedamskopf(cfg):
     live = get(cfg["livedata"])
-    items = []
+    items, reported = [], None
     try:
         im = get(cfg["intermaps"])
+        reported = (im.get("lastUpdate") or "").strip() or None
         for l in im.get("lifts", []):
             items.append({"name": l["popup"]["title"], "kind": "lift", "type": l["popup"].get("subtitle", ""),
                           "open": l.get("status") == "open"})
@@ -228,6 +230,7 @@ def diedamskopf(cfg):
         "condition": None,
         "items": items,
         "source": "diedamskopf.at",
+        "reported": reported,
     }
 
 

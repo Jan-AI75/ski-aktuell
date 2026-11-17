@@ -34,10 +34,11 @@ def main():
         fresh = (st.get("updated") or "")[:10] == day
         snow = (st.get("snow") or {}) if fresh else {}
         entry = {"d": day, "m": r0((h["snow_depth"][i] or 0) * 100), "n": r0(snow_sum(berg, i - 23, i))}
-        if snow.get("mountain") is not None:
+        # Angaben des Skigebiets nur übernehmen, wenn es tatsächlich Schnee meldet (außerhalb der Saison stehen dort Nullen)
+        if (snow.get("mountain") or 0) > 0:
             entry["b"] = r0(snow["mountain"])
-        if snow.get("valley") is not None:
-            entry["t"] = r0(snow["valley"])
+            if snow.get("valley") is not None:
+                entry["t"] = r0(snow["valley"])
         lst[:] = [e for e in lst if e["d"] != day] + [entry]
         cutoff = (date.fromisoformat(day) - timedelta(days=400)).isoformat()
         lst[:] = sorted((e for e in lst if e["d"] >= cutoff), key=lambda e: e["d"])
