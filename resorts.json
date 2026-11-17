@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Skigebiete der App. Neues Gebiet: Block kopieren, id/Name/Punkte anpassen. points: Messpunkte von unten nach oben, der letzte gilt als Berg. lawine: Regionen des Lawinenwarndienstes (z. B. AT-08-01 Bregenzerwaldgebirge), leer lassen, wenn keine passt. aktiv: false blendet ein Gebiet aus. status: Quelle für Lifte/Pisten (typ skiarlberg, micado oder diedamskopf). saisonstart: erster Skitag (JJJJ-MM-TT), wird bis dahin statt des Liftstatus angezeigt. webcams: Bild-Adresse (immer das aktuelle Bild) und Link zur Webcam-Seite.",
+  "_hinweis": "Skigebiete der App. Neues Gebiet: Block kopieren, id/Name/Punkte anpassen. points: Messpunkte von unten nach oben, der letzte gilt als Berg. lawine: Regionen des Lawinenwarndienstes (z. B. AT-08-01 Bregenzerwaldgebirge), leer lassen, wenn keine passt. aktiv: false blendet ein Gebiet aus. status: Quelle für Lifte/Pisten (typ skiarlberg, micado oder diedamskopf). saisonstart: erster Skitag (JJJJ-MM-TT), wird bis dahin statt des Liftstatus angezeigt. webcams: bild (Vorschau, immer das aktuelle Bild), gross (optional, große Ansicht) und link zur Webcam-Seite.",
   "resorts": [
     {
       "id": "warth-schroecken",
@@ -43,12 +43,14 @@
         {
           "name": "Körbersee",
           "bild": "https://www.foto-webcam.eu/webcam/koerbersee/current/400.jpg",
-          "link": "https://www.foto-webcam.eu/webcam/koerbersee/"
+          "link": "https://www.foto-webcam.eu/webcam/koerbersee/",
+          "gross": "https://www.foto-webcam.eu/webcam/koerbersee/current/1200.jpg"
         },
         {
           "name": "Schröcken",
           "bild": "https://www.foto-webcam.eu/webcam/schroecken/current/400.jpg",
-          "link": "https://www.foto-webcam.eu/webcam/schroecken/"
+          "link": "https://www.foto-webcam.eu/webcam/schroecken/",
+          "gross": "https://www.foto-webcam.eu/webcam/schroecken/current/1200.jpg"
         }
       ]
     },
@@ -94,7 +96,8 @@
         {
           "name": "Hasenbühel",
           "bild": "https://www.foto-webcam.eu/webcam/hasenbuehel/current/400.jpg",
-          "link": "https://www.foto-webcam.eu/webcam/hasenbuehel/"
+          "link": "https://www.foto-webcam.eu/webcam/hasenbuehel/",
+          "gross": "https://www.foto-webcam.eu/webcam/hasenbuehel/current/1200.jpg"
         },
         {
           "name": "Uga Berg",
@@ -138,7 +141,8 @@
         {
           "name": "Diedamskopf",
           "bild": "https://www.foto-webcam.eu/webcam/diedamskopf/current/400.jpg",
-          "link": "https://www.foto-webcam.eu/webcam/diedamskopf/"
+          "link": "https://www.foto-webcam.eu/webcam/diedamskopf/",
+          "gross": "https://www.foto-webcam.eu/webcam/diedamskopf/current/1200.jpg"
         },
         {
           "name": "Bergstation",

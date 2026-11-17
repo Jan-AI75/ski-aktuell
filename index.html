@@ -132,14 +132,38 @@ a.btn,button.btn{display:inline-flex;align-items:center;gap:6px;font:600 .86rem 
 .opstate.on .dot{background:var(--up)}
 .opstate em{font-style:normal;font-weight:500;font-size:.78rem;color:var(--warm)}
 .card h2 small.stale{color:var(--warm)}
-.cams{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 16px 14px;scrollbar-width:none}
+.camwrap{position:relative}
+.cams{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 16px 10px;scroll-padding:0 16px;scrollbar-width:none;overscroll-behavior-x:contain}
 .cams::-webkit-scrollbar{display:none}
-.cam{flex:0 0 78%;scroll-snap-align:start;text-decoration:none;color:var(--fg);display:grid;gap:6px}
+.cam{flex:0 0 80%;scroll-snap-align:start;color:var(--fg);display:grid;gap:6px;background:none;border:0;padding:0;font:inherit;text-align:left;cursor:pointer}
 .cam .frame{aspect-ratio:16/9;border-radius:10px;background:var(--accent-soft);border:1px solid var(--line);overflow:hidden}
 .cam img{width:100%;height:100%;object-fit:cover;display:block}
 .cam span{font-size:.8rem;color:var(--muted)}
 .cam.err img{visibility:hidden}
 .cam.err span::after{content:" · gerade nicht erreichbar"}
+.camdots{display:flex;justify-content:center;gap:6px;padding:0 16px 14px}
+.camdots i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.camdots i.on{background:var(--accent)}
+.camnav{position:absolute;top:calc(50% - 22px - 12px);width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:color-mix(in srgb,var(--surface) 85%,transparent);color:var(--fg);display:none;place-items:center;cursor:pointer;padding:0}
+.camnav svg{width:18px;height:18px}
+.camnav.prev{left:8px}.camnav.next{right:8px}
+@media (hover:hover) and (pointer:fine){.camnav{display:grid}}
+.viewer{position:fixed;inset:0;z-index:50;background:#000;display:grid;grid-template-rows:auto 1fr;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.viewer[hidden]{display:none}
+.vbar{display:flex;align-items:center;gap:12px;padding:8px 8px 8px 16px;color:#e9eef2}
+.vbar b{font-family:var(--display);font-weight:500}
+.vbar span{font:400 .8rem var(--mono);color:#9fb0bd;flex:1}
+.vclose{width:44px;height:44px;border-radius:50%;border:1px solid #2a3a46;background:transparent;color:#e9eef2;font-size:1.1rem;cursor:pointer}
+.vstrip{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior:contain}
+.vstrip::-webkit-scrollbar{display:none}
+.vstrip figure{flex:0 0 100%;scroll-snap-align:center;margin:0;display:grid;grid-template-rows:1fr auto;align-items:center;min-width:0}
+.vimg{display:grid;place-items:center;min-height:0;height:100%}
+.vimg img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.vimg.err::after{content:"Bild gerade nicht erreichbar";color:#9fb0bd;font-size:.9rem}
+.vimg.err img{display:none}
+.vstrip figcaption{padding:12px 16px 18px;color:#c9d4dc;font-size:.88rem;text-align:center}
+.vstrip figcaption a{color:#8fcbf0}
+.viewer .camnav{top:calc(50% - 22px);background:rgba(20,28,34,.8);border-color:#2a3a46;color:#e9eef2}
 .chev{width:16px;height:16px;color:var(--muted);margin-left:4px;flex:none}
 .legend i.dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
 .legend i.dash{width:16px;height:0;border-top:2px dashed var(--muted);border-radius:0}
@@ -177,6 +201,7 @@ footer a{color:var(--accent)}
   <nav class="tabs" id="tabs" role="tablist"></nav>
   <div class="status" id="status"><span class="dot"></span><span id="statusText">Lädt …</span></div>
   <main id="main" class="ov"></main>
+  <div id="viewer" class="viewer" role="dialog" aria-modal="true" aria-label="Webcam groß" hidden></div>
   <footer id="footer">
     Wetter, Neuschnee und Schneehöhe: <a href="https://open-meteo.com" rel="noopener">Open-Meteo</a> (Modellwerte, je Höhe berechnet).
     Lawinenlage: <a href="https://warnung.vorarlberg.at/vtgdb/dist/index.html#//lwd_lagebericht.html" rel="noopener">LWD Vorarlberg</a>.
@@ -342,6 +367,7 @@ function render(){
   $("main").innerHTML = VIEW === "overview" ? overviewHTML() : cur ? resortHTML(cur) : emptyHTML();
   $("main").querySelectorAll("[data-go]").forEach(b => b.onclick = () => setView(b.dataset.go));
   $("main").querySelectorAll("[data-retry]").forEach(b => b.onclick = () => refresh());
+  if(cur) wireCams(cur);
   const first = WX && WX[0] && WX[0].current;
   $("eyebrow").textContent = first ? "Stand " + first.time.slice(11,16) + " Uhr" : "Skigebiete";
 }
@@ -438,13 +464,53 @@ function resortHTML(r){
   h += seasonHTML(r);
   return h;
 }
+function camSrc(c, big){ const u = big && c.gross || c.bild; return u + (u.includes("?") ? "&" : "?") + "t=" + Math.floor(Date.now() / 6e5); }
 function camsHTML(r){
   if(!r.webcams || !r.webcams.length) return "";
-  const t = Math.floor(Date.now() / 6e5); // alle 10 Minuten ein frisches Bild
-  return `<div class="card"><h2>Webcams <small>antippen zum Vergrößern</small></h2><div class="cams">` +
-    r.webcams.map(c => `<a class="cam" href="${esc(c.link || c.bild)}" target="_blank" rel="noopener">
-      <div class="frame"><img src="${esc(c.bild)}${c.bild.includes("?") ? "&" : "?"}t=${t}" alt="Webcam ${esc(c.name)}" loading="lazy" decoding="async" onerror="this.closest('a').classList.add('err')"></div>
-      <span>${esc(c.name)}</span></a>`).join("") + `</div></div>`;
+  const n = r.webcams.length;
+  return `<div class="card"><h2>Webcams <small>${n} · wischen, antippen für groß</small></h2>
+    <div class="camwrap">
+      <div class="cams" data-cams>` +
+    r.webcams.map((c, i) => `<button type="button" class="cam" data-cam="${i}" aria-label="Webcam ${esc(c.name)} groß anzeigen">
+      <div class="frame"><img src="${esc(camSrc(c))}" alt="" loading="lazy" decoding="async" onerror="this.closest('.cam').classList.add('err')"></div>
+      <span>${esc(c.name)}</span></button>`).join("") + `</div>
+      ${n > 1 ? `<button type="button" class="camnav prev" data-camstep="-1" aria-label="Vorherige Webcam">${CHEV_L}</button><button type="button" class="camnav next" data-camstep="1" aria-label="Nächste Webcam">${CHEV_R}</button>` : ""}
+    </div>
+    ${n > 1 ? `<div class="camdots" aria-hidden="true">${r.webcams.map((_, i) => `<i${i ? "" : ' class="on"'}></i>`).join("")}</div>` : ""}</div>`;
+}
+const CHEV_R = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+const CHEV_L = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function wireCams(r){
+  const strip = $("main").querySelector("[data-cams]"); if(!strip) return;
+  const items = [...strip.children], dots = [...$("main").querySelectorAll(".camdots i")];
+  const current = () => strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 4 ? items.length - 1
+    : Math.round(strip.scrollLeft / (items[1] ? items[1].offsetLeft - items[0].offsetLeft : 1));
+  strip.addEventListener("scroll", () => { const k = current(); dots.forEach((d, i) => d.classList.toggle("on", i === k)); }, {passive:true});
+  $("main").querySelectorAll("[data-camstep]").forEach(b => b.onclick = () => {
+    const k = Math.max(0, Math.min(items.length - 1, current() + Number(b.dataset.camstep)));
+    strip.scrollTo({left: items[k].offsetLeft - items[0].offsetLeft, behavior: "smooth"});
+  });
+  items.forEach(b => b.onclick = () => openViewer(r, Number(b.dataset.cam)));
+}
+/* Große Ansicht: alle Webcams des Gebiets nebeneinander, wischen oder Pfeile, Esc/✕ schließt */
+function openViewer(r, start){
+  const cams = r.webcams, v = $("viewer");
+  v.innerHTML = `<div class="vbar"><b>${esc(r.name)}</b><span data-vcount></span><button type="button" class="vclose" data-vclose aria-label="Schließen">✕</button></div>
+    <div class="vstrip" data-vstrip>` + cams.map(c => `<figure><div class="vimg"><img src="${esc(camSrc(c, true))}" alt="Webcam ${esc(c.name)}" decoding="async" onerror="this.parentNode.classList.add('err')"></div>
+      <figcaption>${esc(c.name)}${c.link ? ` · <a href="${esc(c.link)}" target="_blank" rel="noopener">Webcam-Seite ↗</a>` : ""}</figcaption></figure>`).join("") + `</div>
+    ${cams.length > 1 ? `<button type="button" class="camnav prev" data-vstep="-1" aria-label="Vorherige Webcam">${CHEV_L}</button><button type="button" class="camnav next" data-vstep="1" aria-label="Nächste Webcam">${CHEV_R}</button>` : ""}`;
+  v.hidden = false; document.body.style.overflow = "hidden";
+  const strip = v.querySelector("[data-vstrip]"), count = v.querySelector("[data-vcount]");
+  const cur = () => Math.round(strip.scrollLeft / strip.clientWidth);
+  const show = () => { count.textContent = cams.length > 1 ? (cur() + 1) + " / " + cams.length : ""; };
+  strip.addEventListener("scroll", show, {passive:true});
+  requestAnimationFrame(() => { strip.scrollLeft = start * strip.clientWidth; show(); });
+  v.querySelectorAll("[data-vstep]").forEach(b => b.onclick = () => strip.scrollTo({left: (cur() + Number(b.dataset.vstep)) * strip.clientWidth, behavior: "smooth"}));
+  const close = () => { v.hidden = true; v.innerHTML = ""; document.body.style.overflow = ""; document.removeEventListener("keydown", key); };
+  const key = e => { if(e.key === "Escape") close(); if(e.key === "ArrowRight" || e.key === "ArrowLeft") strip.scrollTo({left: (cur() + (e.key === "ArrowRight" ? 1 : -1)) * strip.clientWidth, behavior: "smooth"}); };
+  document.addEventListener("keydown", key);
+  v.querySelector("[data-vclose]").onclick = close;
+  v.querySelector("[data-vclose]").focus();
 }
 function lawineHTML(r){
   const today = todayStr(), L = lawFor(r, today);
