@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- D1 „Eisberg Spur“: Eisgipfel mit leuchtender Schwung-Spur -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b2a44"/><stop offset="1" stop-color="#0b1220"/>
+    </linearGradient>
+    <radialGradient id="halo" cx=".5" cy=".42" r=".55">
+      <stop offset="0" stop-color="#7cc0f5" stop-opacity=".35"/><stop offset="1" stop-color="#7cc0f5" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="f1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cfe7fb"/></linearGradient>
+    <linearGradient id="f2" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd3ff"/><stop offset="1" stop-color="#4f9de0"/></linearGradient>
+    <linearGradient id="f3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5aa9ee"/><stop offset="1" stop-color="#1f5fa8"/></linearGradient>
+    <linearGradient id="f4" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e6f4ff"/><stop offset="1" stop-color="#8cc7f7"/></linearGradient>
+    <clipPath id="sq"><rect width="1024" height="1024" rx="230"/></clipPath>
+      <clipPath id="berg"><path d="M200 790 L512 230 L830 790 Z"/></clipPath>
+    <filter id="glowD" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+  <g clip-path="url(#sq)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#halo)"/>
+    <!-- Sterne -->
+    <g fill="#fff" opacity=".6"><circle cx="200" cy="210" r="5"/><circle cx="820" cy="170" r="4"/><circle cx="760" cy="300" r="3"/><circle cx="300" cy="140" r="3"/></g>
+    <!-- Facetten -->
+    <path d="M512 230 L330 520 L470 560 Z" fill="url(#f1)" opacity=".95"/>
+    <path d="M512 230 L470 560 L640 500 Z" fill="url(#f2)" opacity=".9"/>
+    <path d="M512 230 L640 500 L730 520 Z" fill="url(#f3)" opacity=".9"/>
+    <path d="M330 520 L200 790 L470 560 Z" fill="url(#f4)" opacity=".85"/>
+    <path d="M470 560 L200 790 L560 790 Z" fill="url(#f2)" opacity=".75"/>
+    <path d="M470 560 L560 790 L640 500 Z" fill="url(#f3)" opacity=".85"/>
+    <path d="M640 500 L560 790 L830 790 Z" fill="#1f5fa8" opacity=".85"/>
+    <path d="M640 500 L730 520 L830 790 Z" fill="#163f73"/>
+    <!-- Skispur, leuchtend -->
+    <g clip-path="url(#berg)" fill="none" stroke-linecap="round">
+      <path d="M 520 300 C 600 400, 420 470, 500 560 S 380 700, 330 790" stroke="#7cc0f5" stroke-width="22" opacity=".35" filter="url(#glowD)"/>
+      <path d="M 520 300 C 600 400, 420 470, 500 560 S 380 700, 330 790" stroke="#fff" stroke-width="10"/>
+      <path d="M 520 300 C 600 400, 420 470, 500 560 S 380 700, 330 790" stroke="#fff" stroke-width="10" transform="translate(26 4)"/>
+    </g>
+    <!-- Kanten -->
+    <g fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="4" stroke-linejoin="round">
+      <path d="M200 790 L512 230 L830 790"/><path d="M330 520 L470 560 L640 500 L730 520"/><path d="M470 560 L560 790 M640 500 L560 790"/>
+    </g>
+    <rect x="170" y="788" width="690" height="10" rx="5" fill="#7cc0f5" opacity=".7"/>
+  </g>
+  <rect x="3" y="3" width="1018" height="1018" rx="228" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="6"/>
+</svg>

@@ -65,7 +65,7 @@ export default function App() {
         <Sidebar collapsible="none" className="glass h-full rounded-[22px] bg-transparent">
           <SidebarHeader className="px-4 pt-5 pb-2">
             <div className="flex items-center gap-2.5">
-              <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground"><Mountain className="size-4.5" /></span>
+              <img src="./icon.svg" alt="" className="size-8 rounded-[9px] shadow-sm" />
               <span className="font-heading text-headline font-semibold tracking-[-0.015em]">Ski aktuell</span>
             </div>
           </SidebarHeader>

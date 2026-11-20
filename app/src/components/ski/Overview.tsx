@@ -14,7 +14,7 @@ export function Overview({ D, onOpen, onAdd }: { D: SkiData; onOpen: (id: string
   const [adding, setAdding] = useState(false)
   return (
     <div className="grid gap-4">
-      <ul className="grid auto-rows-fr gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <ul className="grid auto-rows-fr gap-4 md:grid-cols-2 2xl:grid-cols-3">
         {activeResorts(D).map((r) => {
           const d = topData(D, r), s = pointStats(d), dp = depths(D, r), L = lawFor(D, r, todayStr())
           const sun = s ? sunHours(d, s.di) : null, best = bestDay(D, r)
@@ -66,7 +66,7 @@ export function Overview({ D, onOpen, onAdd }: { D: SkiData; onOpen: (id: string
 
 export function OverviewSkeleton() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-busy="true" aria-label="Daten werden geladen">
+    <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3" aria-busy="true" aria-label="Daten werden geladen">
       {[0, 1, 2].map((i) => (
         <div key={i} className="surface grid gap-4 p-5">
           <Skeleton className="h-6 w-2/3" /><Skeleton className="h-4 w-1/2" />
