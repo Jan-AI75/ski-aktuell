@@ -176,7 +176,12 @@ a.btn,button.btn{display:inline-flex;align-items:center;gap:6px;font:600 .86rem 
 .pills{display:flex;flex-wrap:wrap;gap:6px}
 .pill.soft{background:transparent;border:1px solid var(--line);font-weight:500;color:var(--muted)}
 .depthrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(8em,1fr));gap:8px 14px}
-.nsblock{display:grid;gap:10px;padding-top:10px;border-top:1px solid var(--line)}
+.depthbig{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5em,1fr));gap:10px clamp(10px,3vw,16px)}
+.depthbig > div{display:grid;gap:2px;min-width:0}
+.depthbig > div + div{padding-left:clamp(10px,3vw,14px);border-left:1px solid var(--line)}
+.depthbig .fl{font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)}
+.depthbig .fd{font-size:.72rem;color:var(--muted)}
+.nsrow{padding-top:10px;border-top:1px solid var(--line)}
 .depthrow > div{display:grid;gap:1px;min-width:0}
 .depthrow .fl{font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)}
 .depthrow .fv{font:500 1.12rem/1.2 var(--mono)}
@@ -534,15 +539,14 @@ function resortHTML(r){
   const op = opState(r);
   let h = `<section class="hero">
     ${op ? `<div class="opstate ${op.cls}"><span class="dot"></span>${esc(op.txt)}${op.age ? `<em>${esc(op.age)}</em>` : ""}</div>` : ""}
-    ${(() => { const dp = depths(r), T = r.points.length > 1 ? r.points[0] : null; return `<div class="depthrow">
-      <div><span class="fl">Schneehöhe Berg</span><span class="fv">${cm(dp.berg)} cm</span><span class="fd">${esc(P.elev)} m · ${dp.src}</span></div>
-      ${T ? `<div><span class="fl">Schneehöhe Tal</span><span class="fv">${cm(dp.tal)} cm</span><span class="fd">${esc(T.name)} ${T.elev} m · ${dp.src}</span></div>` : ""}</div>`; })()}
-    <div class="nsblock">
-      <div class="eyebrow">Neuschnee 24 h · ${esc(P.name)} ${P.elev} m</div>
-      <div class="bigrow">
-        <div class="big">${cm(s.past24)}<small>cm</small></div>
-        <div class="fc"><span class="fl">Nächste 3 Tage</span><span class="fv">+${cm(s.next72)} cm</span><span class="fd">morgen +${cm(s.next24)} cm</span></div>
-      </div>
+    ${(() => { const dp = depths(r), T = r.points.length > 1 ? r.points[0] : null; return `<div class="eyebrow">Schneehöhe · ${dp.src}</div>
+    <div class="depthbig">
+      <div><span class="fl">Berg</span><div class="big">${cm(dp.berg)}<small>cm</small></div><span class="fd">${/^berg$/i.test(P.name) ? "" : esc(P.name) + " "}${esc(P.elev)} m</span></div>
+      ${T ? `<div><span class="fl">Tal</span><div class="big">${cm(dp.tal)}<small>cm</small></div><span class="fd">${esc(T.name)} ${T.elev} m</span></div>` : ""}
+    </div>`; })()}
+    <div class="depthrow nsrow">
+      <div><span class="fl">Neuschnee 24 h</span><span class="fv">${cm(s.past24)} cm</span><span class="fd">72 h: ${cm(s.past72)} cm · Berg</span></div>
+      <div><span class="fl">Nächste 3 Tage</span><span class="fv">+${cm(s.next72)} cm</span><span class="fd">morgen +${cm(s.next24)} cm</span></div>
     </div>
     <div class="pills"><span class="pill">${fmtT(s.temp)} · ${wxText(s.code)}${(() => { const sh = sunHours(d, s.di); return sh != null ? " · heute " + Math.round(sh) + " h Sonne" : ""; })()}</span>${snowline != null ? `<span class="pill soft">Schneefallgrenze ~${snowline} m</span>` : ""}</div>
   </section>`;
