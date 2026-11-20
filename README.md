@@ -4,8 +4,9 @@ Handy-Web-App (GitHub Pages) für ausgewählte Skigebiete: Wetter je Höhe, Neus
 7-Tage-Vorhersage mit „bestem Skitag“, Lawinenlage, Lifte & Pisten live, Saisonverlauf der Schneehöhe.
 
 ## Dateien
-- `index.html` – die App (holt das Wetter live von Open-Meteo, alles andere aus den JSON-Dateien)
-- `resorts.json` – Skigebiete, Messpunkte, Lawinenregionen, Datenquelle für Lifte/Pisten
+- `app/` – Quellcode der App (React, TypeScript, Tailwind, shadcn/ui); Anleitung in `app/README.md`
+- `index.html`, `assets/` – die gebaute App (erzeugt die Action „App bauen“, nicht von Hand ändern)
+- `resorts.json` – Skigebiete, Messpunkte, Lawinenregionen, Datenquelle für Lifte/Pisten, Pistenplan
 - `scripts/update_weather.py` → `weather.json` (Rückfall, wenn Open-Meteo nicht erreichbar)
 - `scripts/update_lawine.py` → `lawine.json` (LWD Vorarlberg, heute + morgen)
 - `scripts/update_status.py` → `status.json` (Lifte, Pisten, Schneebericht der Skigebiete)
@@ -13,7 +14,9 @@ Handy-Web-App (GitHub Pages) für ausgewählte Skigebiete: Wetter je Höhe, Neus
   - Damüls-Mellau: Micado-Schnittstelle von damuels-mellau.at
   - Diedamskopf: diedamskopf.at/webapi/livedata + Intermaps
 - `scripts/update_history.py` → `history.json` (ein Wert pro Tag für den Saisonverlauf)
-- `.github/workflows/update-data.yml` – läuft alle 30 Minuten
+- `sw.js`, `manifest.webmanifest`, `icon-*.png` – installierbare Web-App
+- `.github/workflows/update-data.yml` – Daten, alle 30 Minuten
+- `.github/workflows/build-app.yml` – baut die App bei Änderungen in `app/`
 
 ## Einrichten
 1. Repository `ski-aktuell` anlegen, Dateien hochladen.

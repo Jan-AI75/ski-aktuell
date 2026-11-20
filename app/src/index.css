@@ -1,0 +1,235 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/inter";
+
+/* Dunkle Paletten setzen .dark am <html>; data-palette wählt die Variante. */
+@custom-variant dark (&:is(.dark *));
+
+/* ───────────────────────── Design-Tokens ─────────────────────────
+   Farben: Firn, Weiß, Granit, Fels, Eisblau (Akzent), Abendrot (nur Sonne/Wärme).
+   Schrift: Apple-Systemschrift, Inter als Ersatz. Größen 13/15/17/22/34/64.
+   Radien: Flächen 22 px, Elemente 12 px, Pillen rund. */
+@theme inline {
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter Variable", "Segoe UI", Roboto, system-ui, sans-serif;
+  --font-heading: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter Variable", "Segoe UI", Roboto, system-ui, sans-serif;
+
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.35;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.47;
+  --text-headline: 1.0625rem;
+  --text-headline--line-height: 1.35;
+  --text-title: 1.375rem;
+  --text-title--line-height: 1.2;
+  --text-large: 2.125rem;
+  --text-large--line-height: 1.1;
+  --text-display: 4rem;
+  --text-display--line-height: 0.95;
+
+  --color-snow: var(--snow);
+  --color-warm: var(--warm);
+  --color-up: var(--up);
+  --color-surface: var(--card);
+  --color-fill: var(--fill);
+  --color-glass: var(--glass);
+  --color-glass-line: var(--glass-line);
+
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --shadow-surface: 0 1px 2px rgb(16 24 40 / 0.04), 0 8px 24px rgb(16 24 40 / 0.05);
+  --shadow-glass: 0 10px 40px rgb(16 24 40 / 0.14), 0 1px 2px rgb(16 24 40 / 0.06);
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Hell (Voreinstellung) */
+:root {
+  --radius: 0.75rem;
+  --background: #f3f5f8;       /* Firn */
+  --foreground: #1b1e22;       /* Granit */
+  --card: #ffffff;
+  --card-foreground: #1b1e22;
+  --popover: #ffffff;
+  --popover-foreground: #1b1e22;
+  --primary: #0a66c2;          /* Eisblau */
+  --primary-foreground: #ffffff;
+  --secondary: #e9edf2;
+  --secondary-foreground: #1b1e22;
+  --muted: #e9edf2;
+  --muted-foreground: #646a71; /* Fels, AA auf Weiß und Firn */
+  --accent: #e3eefa;
+  --accent-foreground: #0a4f96;
+  --destructive: #c8102e;
+  --border: rgb(27 30 34 / 0.09);
+  --input: rgb(27 30 34 / 0.14);
+  --ring: #0a66c2;
+  --fill: #eef1f5;
+  --snow: #0a66c2;
+  --warm: #c2410c;             /* Abendrot */
+  --up: #1d7f3e;
+  --glass: rgb(255 255 255 / 0.68);
+  --glass-solid: #f8f9fb;
+  --glass-line: rgb(27 30 34 / 0.08);
+  --glass-hi: rgb(255 255 255 / 0.8);
+  --chart-1: #0a66c2;
+  --chart-2: #9aa3ad;
+  --chart-3: #c2410c;
+  --chart-4: #1d7f3e;
+  --chart-5: #6a7077;
+  --sidebar: var(--glass);
+  --sidebar-foreground: #1b1e22;
+  --sidebar-primary: #0a66c2;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgb(10 102 194 / 0.1);
+  --sidebar-accent-foreground: #1b1e22;
+  --sidebar-border: var(--glass-line);
+  --sidebar-ring: #0a66c2;
+  color-scheme: light;
+}
+
+/* Dunkel: abgestufter Schiefer, kein reines Schwarz */
+.dark {
+  --background: #0f1318;
+  --foreground: #eef2f6;
+  --card: #181d24;
+  --card-foreground: #eef2f6;
+  --popover: #1d232b;
+  --popover-foreground: #eef2f6;
+  --primary: #7cc0f5;          /* Eis */
+  --primary-foreground: #08121c;
+  --secondary: #222932;
+  --secondary-foreground: #eef2f6;
+  --muted: #222932;
+  --muted-foreground: #9aa4b0;
+  --accent: rgb(124 192 245 / 0.14);
+  --accent-foreground: #cfe7fb;
+  --destructive: #ff6b6b;
+  --border: rgb(255 255 255 / 0.08);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: #7cc0f5;
+  --fill: #20262e;
+  --snow: #cfe7fb;
+  --warm: #ffb15c;
+  --up: #4cd27a;
+  --glass: rgb(26 31 38 / 0.62);
+  --glass-solid: #1a1f26;
+  --glass-line: rgb(255 255 255 / 0.1);
+  --glass-hi: rgb(255 255 255 / 0.06);
+  --chart-1: #7cc0f5;
+  --chart-2: #5b6570;
+  --chart-3: #ffb15c;
+  --chart-4: #4cd27a;
+  --chart-5: #9aa4b0;
+  --sidebar: var(--glass);
+  --sidebar-foreground: #eef2f6;
+  --sidebar-primary: #7cc0f5;
+  --sidebar-primary-foreground: #08121c;
+  --sidebar-accent: rgb(124 192 245 / 0.14);
+  --sidebar-accent-foreground: #eef2f6;
+  --sidebar-border: var(--glass-line);
+  --sidebar-ring: #7cc0f5;
+  color-scheme: dark;
+}
+/* Gletscher: die frühere Ski-aktuell-Optik */
+.dark[data-palette="gletscher"] {
+  --background: #0c1620; --card: #122130; --popover: #15283a; --foreground: #e4edf3; --card-foreground: #e4edf3; --popover-foreground: #e4edf3;
+  --muted: #183048; --secondary: #183048; --muted-foreground: #8aa0b2; --fill: #183048;
+  --primary: #7cc4ea; --ring: #7cc4ea; --snow: #cfe9f8; --warm: #f0a070; --up: #6cc890;
+  --glass: rgb(18 33 48 / 0.66); --glass-solid: #122130; --glass-line: rgb(124 196 234 / 0.16);
+}
+/* Nachtsicht: rot, schont die Dunkeladaption */
+.dark[data-palette="nacht"] {
+  --background: #070303; --card: #110606; --popover: #160808; --foreground: #ff6a5c; --card-foreground: #ff6a5c; --popover-foreground: #ff6a5c;
+  --muted: #210b09; --secondary: #210b09; --muted-foreground: #c2513f; --fill: #1d0907; --accent: #2a0d0a; --accent-foreground: #ff8a7c;
+  --primary: #e8604f; --primary-foreground: #070303; --ring: #e8604f; --snow: #ff8a7c; --warm: #ff6a5c; --up: #ff6a5c;
+  --border: #2a0f0c; --glass: rgb(17 6 6 / 0.72); --glass-solid: #110606; --glass-line: #2a0f0c; --glass-hi: transparent;
+  --sidebar-foreground: #ff6a5c; --sidebar-accent: #2a0d0a; --sidebar-accent-foreground: #ff8a7c; --sidebar-primary: #e8604f;
+}
+
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground text-body;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.006em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+}
+
+@layer components {
+  /* Liquid Glass – nur für schwebende Bedienelemente. Ohne backdrop-filter: feste Fläche. */
+  .glass {
+    background: var(--glass-solid);
+    border: 1px solid var(--glass-line);
+    box-shadow: var(--shadow-glass), inset 0 1px 0 var(--glass-hi);
+  }
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass {
+      background: var(--glass);
+      -webkit-backdrop-filter: saturate(180%) blur(22px);
+      backdrop-filter: saturate(180%) blur(22px);
+    }
+  }
+  /* Gruppierte Fläche im iOS-Stil */
+  .surface {
+    background: var(--card);
+    border-radius: 22px;
+    box-shadow: var(--shadow-surface);
+  }
+  .dark .surface { box-shadow: inset 0 0 0 1px var(--border); }
+  .hairline > * + * { border-top: 1px solid var(--border); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

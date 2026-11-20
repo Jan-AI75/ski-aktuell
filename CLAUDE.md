@@ -1,10 +1,16 @@
 # CLAUDE.md – Premium Apple Design System
 
 ## Projekt-Hinweise (Ski aktuell)
-- Die App ist bewusst eine einzelne `index.html` ohne Build-Schritt (GitHub Pages, Daten per GitHub Action alle 30 Min.).
-  React/Tailwind aus Abschnitt 8 gelten hier nicht: bestehende Architektur beibehalten, Design-Tokens stehen als CSS-Variablen oben im `<style>`.
-- Paletten: Voreinstellung „Automatisch“ (hell/dunkel nach System), außerdem Hell, Dunkel, Gletscher, Nachtsicht (`data-palette` am `<html>`).
-- Lawinenstufen-Farben sind die offiziellen EAWS-Farben und bleiben unverändert.
+- Aufbau: React-App in `app/` (Vite, React, TypeScript, Tailwind v4, shadcn/ui mit Base UI und Preset Nova, Motion, Lucide).
+  Die Action „App bauen“ legt die gebaute `index.html` und `assets/` in den Hauptordner, den GitHub Pages ausliefert.
+  `index.html` und `assets/` im Hauptordner nie von Hand ändern, nur `app/`.
+- Daten: `*.json` im Hauptordner, aktualisiert von der Action „Skidaten aktualisieren“ (alle 30 Min., `scripts/`).
+  Die App lädt sie relativ (`./`); beim Entwickeln zeigt `app/.env.development` auf GitHub Pages.
+- Design-Tokens: `app/src/index.css` (Farben Firn/Weiß/Granit/Fels/Eisblau/Abendrot, Schriftgrößen caption–display, Glas).
+  Neue Schriftgrößen auch in `app/src/lib/utils.ts` (cn-Konfiguration) eintragen.
+- Fachlogik: `app/src/lib/model.ts`. Lawinenstufen-Farben sind die offiziellen EAWS-Farben und bleiben unverändert.
+- Eigene Gebiete (Kachel „Skigebiet hinzufügen“) liegen nur im localStorage des Geräts; feste Gebiete in `resorts.json`.
+- Qualitätsprüfung: in `app/` `npm run build` und `npm run lint`, dann im Browser Handy/Tablet/Desktop, hell/dunkel.
 
 ## 1. Deine Rolle
 Du bist mein Senior Product Designer, UX-Architekt und Frontend Engineer.
