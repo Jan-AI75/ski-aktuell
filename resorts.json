@@ -37,6 +37,12 @@
       "saisonstart": "2026-12-04",
       "webcams": [
         {
+          "name": "Steffisalp",
+          "bild": "https://wtvpict.feratel.com/picture/38/5816.jpeg?dcsdesign=WTP_skiarlberg.at&design=noxdesign",
+          "gross": "https://wtvpict.feratel.com/picture/35/5816.jpeg?dcsdesign=WTP_skiarlberg.at&design=noxdesign",
+          "link": "https://webtv.feratel.com/webtv/?design=v4&pg=ECA0794E-0FB5-4514-B818-73937CC442AC&cam=5816"
+        },
+        {
           "name": "Salober Berg",
           "bild": "https://live-image.panomax.com/cams/786/salober_berg_591x332.jpg",
           "link": "https://www.skiarlberg.at/de/warth-schroecken/live-infos/webcams"
