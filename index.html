@@ -66,6 +66,11 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-off
 .card h2{font-family:var(--display);font-weight:500;font-size:1.05rem;margin:0;padding:12px 16px 4px;display:flex;justify-content:space-between;align-items:baseline;gap:4px 8px;flex-wrap:wrap}
 .card h2 small{font:400 .74rem var(--mono);color:var(--muted)}
 .card .note{font-size:.78rem;color:var(--muted);padding:8px 16px 12px;border-top:1px solid var(--line)}
+.mapbox{position:relative;height:clamp(280px,78vw,480px);border-top:1px solid var(--line);background:var(--bg)}
+.mapbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
+.mapbox.on iframe{pointer-events:auto}
+.mapbox .mapgo{position:absolute;inset:auto 0 44px;margin:auto;width:max-content;font:600 .82rem var(--sans,inherit);padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.mapbox.on .mapgo{display:none}
 .card .pad{padding:4px 16px 14px}
 .row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:11px 16px;border-top:1px solid var(--line)}
 .card h2 + .row{border-top:0}
@@ -459,6 +464,7 @@ function render(){
   $("main").innerHTML = VIEW === "overview" ? overviewHTML() : cur ? resortHTML(cur) : emptyHTML();
   $("main").querySelectorAll("[data-go]").forEach(b => b.onclick = () => setView(b.dataset.go));
   $("main").querySelectorAll("[data-retry]").forEach(b => b.onclick = () => refresh());
+  $("main").querySelectorAll("[data-mapon]").forEach(b => b.onclick = () => b.parentElement.classList.add("on"));
   if(cur) wireCams(cur);
   const first = WX && WX[0] && WX[0].current;
   $("eyebrow").textContent = "Skigebiete";
@@ -562,6 +568,7 @@ function resortHTML(r){
   h += daysHTML(r, d, s);
   h += chartHTML(d, s);
   h += liftsHTML(r);
+  h += karteHTML(r);
   h += seasonHTML(r);
   return h;
 }
@@ -728,6 +735,13 @@ function chartHTML(d, s){
   svg += `</svg>`;
   return `<div class="card"><h2>Schneefall <small>Berg · cm pro Tag</small></h2><div class="pad">${svg}</div>
     <div class="legend"><span><i style="background:var(--muted);opacity:.45"></i>letzte 7 Tage</span><span><i style="background:var(--snow)"></i>Vorhersage</span><span><i class="dot"></i>heute</span></div></div>`;
+}
+function karteHTML(r){
+  if(!r.karte) return "";
+  return `<div class="card"><h2>Pistenplan <small>interaktiv · Intermaps</small></h2>
+    <div class="mapbox" data-map><iframe src="${esc(r.karte)}" title="Pistenplan ${esc(r.name)}" loading="lazy" referrerpolicy="no-referrer"></iframe>
+      <button type="button" class="mapgo" data-mapon>Antippen zum Bewegen</button></div>
+    <div class="pad" style="padding-top:12px"><a class="btn" href="${esc(r.karte)}" target="_blank" rel="noopener">Pistenplan im Vollbild ↗</a></div></div>`;
 }
 function liftsHTML(r){
   const st = STAT && STAT[r.id];
