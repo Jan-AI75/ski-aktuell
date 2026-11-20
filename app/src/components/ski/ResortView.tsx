@@ -28,7 +28,7 @@ export function ResortView({ D, r, onRemove }: { D: SkiData; r: Resort; onRemove
     </div>
   )
   return (
-    <div className="grid gap-7 lg:block lg:columns-2 lg:gap-7 [&>*]:lg:mb-7">
+    <div className="resort-grid grid gap-7" data-custom={r.custom ? "" : undefined}>
       <Hero D={D} r={r} />
       <DayCourse D={D} r={r} />
       <AvalancheSection D={D} r={r} />
@@ -48,7 +48,7 @@ export function ResortView({ D, r, onRemove }: { D: SkiData; r: Resort; onRemove
 function RemoveResort({ r, onRemove }: { r: Resort; onRemove: () => void }) {
   const [ask, setAsk] = useState(false)
   return (
-    <div className="break-inside-avoid px-1 lg:[column-span:all]">
+    <div data-area="remove" className="px-1">
       <button type="button" onClick={() => setAsk(true)}
         className="inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-caption font-semibold text-destructive hover:bg-destructive/10">
         <Trash2 className="size-4" />{r.name} entfernen
@@ -76,7 +76,7 @@ function Hero({ D, r }: { D: SkiData; r: Resort }) {
   const T = r.points.length > 1 ? r.points[0] : null
   const stats = r.points.map((_, i) => pointStats(pointData(D, r, i)))
   return (
-    <section className="surface break-inside-avoid p-5 sm:p-7 lg:[column-span:all]" aria-label={`${r.name}: Schneelage`}>
+    <section data-area="hero" className="surface p-5 sm:p-7" aria-label={`${r.name}: Schneelage`}>
       {op && (
         <p className="mb-5 flex flex-wrap items-center gap-x-2 gap-y-1 text-body font-medium">
           <span className={cn("size-2 rounded-full", op.on ? "bg-up shadow-[0_0_0_3px_color-mix(in_srgb,var(--up)_22%,transparent)]" : "bg-muted-foreground")} />
@@ -137,7 +137,7 @@ function DayCourse({ D, r }: { D: SkiData; r: Resort }) {
   let fog = false
   if (d.hourly.visibility) for (const hh of [9, 10, 11, 12, 13, 14, 15]) { const v = d.hourly.visibility[idx(hh)]; if (v != null && v < 1000) fog = true }
   return (
-    <Section title={tomorrow ? "Morgen am Berg" : "Heute am Berg"} aside={`${P.name}, ${P.elev} m`}>
+    <Section area="day" title={tomorrow ? "Morgen am Berg" : "Heute am Berg"} aside={`${P.name}, ${P.elev} m`}>
       <ol className="grid grid-cols-5 px-2 pt-4 pb-3">
         {[8, 10, 12, 14, 16].map((hh) => {
           const i = idx(hh); if (i < 0) return <li key={hh} />
@@ -168,7 +168,7 @@ function AvalancheSection({ D, r }: { D: SkiData; r: Resort }) {
   const empty = !r.lawine?.length ? "Für dieses Gebiet ist keine Lawinenwarnregion hinterlegt."
     : !L ? "Noch kein Lagebericht für heute. Der Lawinenwarndienst veröffentlicht ihn in der Wintersaison täglich." : null
   return (
-    <Section title="Lawinenlage" aside="LWD Vorarlberg">
+    <Section area="law" title="Lawinenlage" aside="LWD Vorarlberg">
       {empty || !L ? <Note>{empty}</Note> : (() => {
         const det = ratingDetail(L.e), T = lawFor(D, r, tomorrowStr())
         const probs = L.e.problems.filter((p) => PROBLEM[p.type])
@@ -209,7 +209,7 @@ function AvalancheSection({ D, r }: { D: SkiData; r: Resort }) {
 /* ---------- Jetzt nach Höhe ---------- */
 function NowByAltitude({ D, r }: { D: SkiData; r: Resort }) {
   return (
-    <Section title="Jetzt nach Höhe">
+    <Section area="now" title="Jetzt nach Höhe">
       <ul className="hairline">
         {r.points.map((p, i) => {
           const q = pointStats(pointData(D, r, i)); if (!q) return null
@@ -242,7 +242,7 @@ function SevenDays({ D, r }: { D: SkiData; r: Resort }) {
   const rows = []
   for (let k = Math.max(0, s.di); k < Dy.time.length && k < s.di + 7; k++) rows.push(k)
   return (
-    <Section title="7 Tage" aside="am Berg, darunter im Tal">
+    <Section area="days" title="7 Tage" aside="am Berg, darunter im Tal">
       <ul className="hairline">
         {rows.map((k) => {
           const dt = new Date(Dy.time[k] + "T12:00:00")
@@ -300,7 +300,7 @@ function SnowChart({ D, r }: { D: SkiData; r: Resort }) {
   const W = 340, H = 150, padB = 26, padT = 18, max = Math.max(10, ...vals.map((v) => v || 0)), bw = W / n
   const Y = (v: number) => H - padB - (v / max) * (H - padB - padT)
   return (
-    <Section title="Schneefall" aside="cm pro Tag am Berg">
+    <Section area="chart" title="Schneefall" aside="cm pro Tag am Berg">
       <div className="px-4 pt-4 pb-2">
         <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Neuschnee pro Tag, letzte und nächste Woche">
           <line x1="0" x2={W} y1={H - padB} y2={H - padB} stroke="var(--border)" />
@@ -334,11 +334,11 @@ function Lifts({ D, r }: { D: SkiData; r: Resort }) {
   const when = st?.updated ? new Date(st.updated).toLocaleString("de-DE", { day: "numeric", month: "numeric", hour: "2-digit", minute: "2-digit" }) : ""
   const age = reportAge(st)
   const linkRow = link && <div className="px-5 pb-5"><ExternalLink href={link}>Live-Info des Skigebiets</ExternalLink></div>
-  if (!st) return <Section title="Lifte und Pisten"><Note>Das Skigebiet hat noch keine Daten geliefert.</Note>{linkRow}</Section>
+  if (!st) return <Section area="lifts" title="Lifte und Pisten"><Note>Das Skigebiet hat noch keine Daten geliefert.</Note>{linkRow}</Section>
   if (allClosed(st)) {
     const start = seasonStart(r)
     return (
-      <Section title="Lifte und Pisten" aside={age || when}>
+      <Section area="lifts" title="Lifte und Pisten" aside={age || when}>
         <div className="px-5 pt-5 pb-4">
           <div className="text-headline font-semibold">{start ? `Saisonstart am ${start}` : "Zurzeit sind alle Lifte geschlossen."}</div>
           <p className="mt-1 text-caption text-muted-foreground">
@@ -352,7 +352,7 @@ function Lifts({ D, r }: { D: SkiData; r: Resort }) {
   }
   const sn = st.snow ?? {}
   return (
-    <Section title="Lifte und Pisten" aside={<span className={cn(age && "text-warm")}>{age || when}</span>}>
+    <Section area="lifts" title="Lifte und Pisten" aside={<span className={cn(age && "text-warm")}>{age || when}</span>}>
       <div className="grid grid-cols-2 gap-4 px-5 pt-5 pb-4">
         {st.lifts && <Metric label="Lifte offen" value={`${fmt0(st.lifts.open)}`} unit={`/ ${fmt0(st.lifts.total)}`} />}
         {st.slopes && <Metric label="Pisten offen" value={fmt0(st.slopes.open)} unit={`/ ${fmt0(st.slopes.total)} ${st.slopes.unit ?? ""}`} />}
@@ -400,8 +400,8 @@ function PisteMap({ r }: { r: Resort }) {
   const [active, setActive] = useState(false)
   if (!r.karte) return null
   return (
-    <Section title="Pistenplan" aside="interaktiv, Intermaps">
-      <div className="relative h-[clamp(280px,78vw,440px)] bg-fill">
+    <Section area="map" title="Pistenplan" aside="interaktiv, Intermaps">
+      <div className="relative h-[clamp(280px,78vw,440px)] bg-fill lg:h-auto lg:min-h-80 lg:flex-1">
         <iframe src={r.karte} title={`Pistenplan ${r.name}`} loading="lazy" referrerPolicy="no-referrer"
           className={cn("absolute inset-0 size-full border-0", !active && "pointer-events-none")} />
         {!active && (
@@ -422,7 +422,7 @@ function Season({ D, r }: { D: SkiData; r: Resort }) {
   // Saison ab 1. Oktober, bezogen auf den jüngsten Eintrag
   const lastD = all.length ? all[all.length - 1].d : "", y = Number(lastD.slice(0, 4)), yr = Number(lastD.slice(5, 7)) >= 9 ? y : y - 1
   const pts = all.filter((e) => e.d >= `${yr}-10-01`)
-  if (pts.length < 2) return <Section title="Saisonverlauf"><Note>Der Verlauf füllt sich ab jetzt täglich.</Note></Section>
+  if (pts.length < 2) return <Section area="season" title="Saisonverlauf"><Note>Der Verlauf füllt sich ab jetzt täglich.</Note></Section>
   const repB = pts.some((e) => (e.b ?? 0) > 0), repT = pts.some((e) => (e.t ?? 0) > 0), hasT = pts.some((e) => e.mt != null || (e.t ?? 0) > 0)
   type Key = "b" | "m" | "t" | "mt"
   const series: { name: string; key: Key; rep: boolean; col: string }[] = [{ name: "Berg", key: repB ? "b" : "m", rep: repB, col: "var(--snow)" }]
@@ -440,7 +440,7 @@ function Season({ D, r }: { D: SkiData; r: Resort }) {
   }
   const last = pts[pts.length - 1]
   return (
-    <Section title="Saisonverlauf" aside="Schneehöhe Berg und Tal">
+    <Section area="season" title="Saisonverlauf" aside="Schneehöhe Berg und Tal">
       <div className="px-4 pt-4 pb-2">
         <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Schneehöhe am Berg und im Tal in dieser Saison">
           {[0, max / 2, max].map((v) => (

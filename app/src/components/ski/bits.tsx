@@ -37,16 +37,18 @@ export function AvalancheBadge({ level, size = "md" }: { level: number | null; s
 }
 
 /** Abschnitt im iOS-Stil: Überschrift über der Fläche, Inhalt auf der Fläche. */
-export function Section({ title, aside, children, className, id }: {
+export function Section({ title, aside, children, className, id, area }: {
   title: string; aside?: ReactNode; children: ReactNode; className?: string; id?: string
+  /** Platz im Raster der Detailseite (ab 1024 px), siehe .resort-grid in index.css */
+  area?: string
 }) {
   return (
-    <section aria-labelledby={id} className={cn("break-inside-avoid", className)}>
+    <section aria-labelledby={id} data-area={area} className={cn("flex min-w-0 flex-col", className)}>
       <div className="mb-2 flex items-baseline justify-between gap-3 px-1">
         <h2 id={id} className="font-heading text-headline font-semibold tracking-[-0.015em]">{title}</h2>
         {aside && <span className="text-caption text-muted-foreground">{aside}</span>}
       </div>
-      <div className="surface overflow-hidden">{children}</div>
+      <div className="surface flex flex-1 flex-col overflow-hidden [&>*:last-child:not(:first-child)]:mt-auto">{children}</div>
     </section>
   )
 }

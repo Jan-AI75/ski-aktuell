@@ -225,6 +225,41 @@
   .hairline > * + * { border-top: 1px solid var(--border); }
 }
 
+/* Detailseite ab 1024 px: festes Raster, Zusammengehöriges nebeneinander, gemeinsame Kanten je Zeile.
+   Unter 1024 px: eine Spalte in der Reihenfolge des Codes. */
+@media (min-width: 1024px) {
+  .resort-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "hero hero"
+      "day  now"
+      "days chart"
+      "days season"
+      "law  lifts"
+      "cams map"
+      "remove remove";
+  }
+  /* Eigene Gebiete: ohne Lawine, Lifte, Saisonverlauf, Webcams und Pistenplan */
+  .resort-grid[data-custom] {
+    grid-template-areas:
+      "hero hero"
+      "day  now"
+      "days chart"
+      "remove remove";
+  }
+  .resort-grid > [data-area="hero"] { grid-area: hero; }
+  .resort-grid > [data-area="day"] { grid-area: day; }
+  .resort-grid > [data-area="now"] { grid-area: now; }
+  .resort-grid > [data-area="days"] { grid-area: days; }
+  .resort-grid > [data-area="chart"] { grid-area: chart; }
+  .resort-grid > [data-area="season"] { grid-area: season; }
+  .resort-grid > [data-area="law"] { grid-area: law; }
+  .resort-grid > [data-area="lifts"] { grid-area: lifts; }
+  .resort-grid > [data-area="cams"] { grid-area: cams; }
+  .resort-grid > [data-area="map"] { grid-area: map; }
+  .resort-grid > [data-area="remove"] { grid-area: remove; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

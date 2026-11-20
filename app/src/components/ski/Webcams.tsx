@@ -28,7 +28,7 @@ export function Webcams({ r }: { r: Resort }) {
   }
 
   return (
-    <Section title="Webcams" aside={cams.length > 1 ? `${cams.length} Kameras` : undefined}>
+    <Section area="cams" title="Webcams" aside={cams.length > 1 ? `${cams.length} Kameras` : undefined}>
       <div className="group/cams relative">
         <div ref={strip} onScroll={onScroll}
           className="flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto overscroll-x-contain px-5 pt-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
