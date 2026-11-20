@@ -27,7 +27,7 @@
       ],
       "live": "https://www.skiarlberg.at/de/warth-schroecken/live-infos/anlagen",
       "web": "https://www.skiarlberg.at/de/warth-schroecken",
-      "karte": "https://skiarlberg.intermaps.com/skiarlberg?zoomRegion=warth_schroecken&lang=de&ctrlZoom=true",
+      "karte": "https://winter.intermaps.com/warth_schroecken?lang=de&ctrlZoom=true",
       "status": {
         "typ": "skiarlberg",
         "regionId": 327,
