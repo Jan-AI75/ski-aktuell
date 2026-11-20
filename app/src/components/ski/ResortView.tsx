@@ -104,7 +104,7 @@ function Hero({ D, r }: { D: SkiData; r: Resort }) {
           </div>
           <p className="text-caption text-muted-foreground">
             {dp.reported ? "Gemeldet vom Skigebiet." : "Modellwert, das Skigebiet meldet noch nicht."}{" "}
-            {P.elev} m{T ? ` und ${T.elev} m (${T.name})` : ""}.
+            {P.elev}{"\u00a0"}m{T ? ` und ${T.elev}\u00a0m (${T.name})` : ""}.
           </p>
           <div className="grid grid-cols-2 gap-4 border-t pt-5">
             <Metric label="Neuschnee 24 h" value={cm(s.past24)} unit="cm" note={`72 h: ${cm(s.past72)} cm`} />
