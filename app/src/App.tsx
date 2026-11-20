@@ -10,7 +10,7 @@ import { activeResorts, cm, depths, lawFor, todayStr } from "@/lib/model"
 import type { SkiData } from "@/lib/types"
 import { Overview, OverviewSkeleton, ErrorState } from "@/components/ski/Overview"
 import { ResortView } from "@/components/ski/ResortView"
-import { AvalancheBadge } from "@/components/ski/bits"
+import { AvalancheBadge, ResortLogo } from "@/components/ski/bits"
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -99,7 +99,10 @@ export default function App() {
         <div className="mx-auto max-w-6xl">
           <header className="mb-6 flex items-end justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="font-heading text-[1.875rem] leading-[1.1] font-bold tracking-[-0.03em] text-balance [hyphens:auto] sm:text-large lg:text-[2.5rem]">{title}</h1>
+              <div className="flex items-center gap-3">
+                {resort && <ResortLogo src={resort.logo} size="lg" />}
+                <h1 className="min-w-0 font-heading text-[1.875rem] leading-[1.1] font-bold tracking-[-0.03em] text-balance [hyphens:auto] sm:text-large lg:text-[2.5rem]">{title}</h1>
+              </div>
               <div className="mt-1 lg:hidden"><StatusLine D={D} loading={loading} /></div>
               {resort?.region && <div className="mt-1 hidden text-body text-muted-foreground lg:block">{resort.region}</div>}
             </div>
@@ -150,6 +153,7 @@ function ResortNavItem({ D, id, active, onSelect }: { D: SkiData; id: string; ac
   return (
     <SidebarMenuItem>
       <SidebarMenuButton isActive={active} onClick={() => onSelect(id)} size="lg" className="h-auto rounded-xl py-2.5">
+        <ResortLogo src={r.logo} size="sm" />
         <div className="min-w-0 flex-1">
           <div className="truncate text-body font-medium">{r.name}</div>
           <div className="text-caption text-muted-foreground">{dp ? `${cm(dp.berg)} cm Schnee am Berg` : r.region}</div>

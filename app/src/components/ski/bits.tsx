@@ -1,5 +1,5 @@
 /* Kleine, wiederverwendete Bausteine: Wetter-Icon, Lawinenstufe, Abschnitt, Kennzahl. */
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { Cloud, CloudFog, CloudRain, CloudSnow, CloudSun, Sun } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { KIND_TXT, LEVEL_TXT, type Kind } from "@/lib/model"
@@ -24,6 +24,17 @@ const LV_STYLE = [
   "bg-[#ff3b30] text-white",
   "bg-[repeating-linear-gradient(45deg,#ff3b30_0_6px,#111_6px_12px)] text-white",
 ]
+/* Symbol des Skigebiets als abgerundete Kachel. Lädt es nicht, bleibt nur der Name stehen. */
+const LOGO_SIZE = { sm: "size-6 rounded-[7px]", md: "size-9 rounded-[10px]", lg: "size-11 rounded-[12px] sm:size-12 sm:rounded-[13px]" }
+export function ResortLogo({ src, size = "md", className }: { src?: string; size?: keyof typeof LOGO_SIZE; className?: string }) {
+  const [failed, setFailed] = useState(false)
+  if (!src || failed) return null
+  return (
+    <img src={src} alt="" aria-hidden="true" decoding="async" loading="lazy" onError={() => setFailed(true)}
+      className={cn("shrink-0 border border-border bg-card object-cover", LOGO_SIZE[size], className)} />
+  )
+}
+
 export function AvalancheBadge({ level, size = "md" }: { level: number | null; size?: "md" | "lg" }) {
   const lv = level ?? 0
   return (

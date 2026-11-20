@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Skigebiete der App. Neues Gebiet: Block kopieren, id/Name/Punkte anpassen. points: Messpunkte von unten nach oben, der letzte gilt als Berg. lawine: Regionen des Lawinenwarndienstes (z. B. AT-08-01 Bregenzerwaldgebirge), leer lassen, wenn keine passt. aktiv: false blendet ein Gebiet aus. status: Quelle für Lifte/Pisten (typ skiarlberg, micado oder diedamskopf). saisonstart: erster Skitag (JJJJ-MM-TT), wird bis dahin statt des Liftstatus angezeigt. karte: Adresse der interaktiven Pistenkarte (z. B. Intermaps), leer lassen, wenn keine. webcams: bild (Vorschau, immer das aktuelle Bild), gross (optional, große Ansicht) und link zur Webcam-Seite.",
+  "_hinweis": "Skigebiete der App. Neues Gebiet: Block kopieren, id/Name/Punkte anpassen. points: Messpunkte von unten nach oben, der letzte gilt als Berg. lawine: Regionen des Lawinenwarndienstes (z. B. AT-08-01 Bregenzerwaldgebirge), leer lassen, wenn keine passt. aktiv: false blendet ein Gebiet aus. status: Quelle für Lifte/Pisten (typ skiarlberg, micado oder diedamskopf). saisonstart: erster Skitag (JJJJ-MM-TT), wird bis dahin statt des Liftstatus angezeigt. karte: Adresse der interaktiven Pistenkarte (z. B. Intermaps), leer lassen, wenn keine. webcams: bild (Vorschau, immer das aktuelle Bild), gross (optional, große Ansicht) und link zur Webcam-Seite. logo: quadratisches App-Symbol des Skigebiets (meist /pwa/apple-icon-180.png), optional.",
   "resorts": [
     {
       "id": "warth-schroecken",
@@ -59,7 +59,8 @@
           "link": "https://www.foto-webcam.eu/webcam/schroecken/",
           "gross": "https://www.foto-webcam.eu/webcam/schroecken/current/1200.jpg"
         }
-      ]
+      ],
+      "logo": "https://www.warth-schroecken.at/pwa/apple-icon-180.png"
     },
     {
       "id": "damuels-mellau",
@@ -112,7 +113,8 @@
           "bild": "https://webcams.damuels-mellau.at/Uga/uga.jpg",
           "link": "https://webcams.damuels-mellau.at/Uga/uga.jpg"
         }
-      ]
+      ],
+      "logo": "https://www.damuels-mellau.at/pwa/apple-icon-180.png"
     },
     {
       "id": "diedamskopf",
@@ -163,7 +165,8 @@
           "bild": "https://www1.camynocloud.at/diedamskopf/pictures/breitenalpe.jpg",
           "link": "https://www.diedamskopf.at/de/webcams.html"
         }
-      ]
+      ],
+      "logo": "https://www.diedamskopf.at/pwa/apple-icon-180.png"
     }
   ]
 }

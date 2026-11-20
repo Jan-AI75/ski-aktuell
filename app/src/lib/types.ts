@@ -15,6 +15,8 @@ export interface Resort {
   karte?: string
   saisonstart?: string
   webcams?: Webcam[]
+  /** Quadratisches App-Symbol des Skigebiets (z. B. /pwa/apple-icon-180.png) */
+  logo?: string
   /** Selbst hinzugefügt, nur auf diesem Gerät gespeichert */
   custom?: boolean
 }

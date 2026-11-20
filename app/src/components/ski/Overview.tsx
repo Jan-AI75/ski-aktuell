@@ -8,7 +8,7 @@ import {
 } from "@/lib/model"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AvalancheBadge, Metric, WeatherIcon } from "./bits"
+import { AvalancheBadge, Metric, ResortLogo, WeatherIcon } from "./bits"
 
 export function Overview({ D, onOpen, onAdd }: { D: SkiData; onOpen: (id: string) => void; onAdd: (r: Resort) => void }) {
   const [adding, setAdding] = useState(false)
@@ -23,6 +23,7 @@ export function Overview({ D, onOpen, onAdd }: { D: SkiData; onOpen: (id: string
               <button type="button" onClick={() => onOpen(r.id)} aria-label={`${r.name}: Details öffnen`}
                 className="surface group flex h-full w-full flex-col p-5 text-left transition-[transform,box-shadow] duration-200 ease-(--ease-out-soft) hover:-translate-y-0.5 hover:shadow-glass active:scale-[0.985]">
                 <div className="flex items-start gap-3">
+                  <ResortLogo src={r.logo} size="md" className="mt-0.5" />
                   <div className="min-w-0 flex-1">
                     <div className="font-heading text-title font-semibold tracking-[-0.02em]">{r.name}</div>
                     <div className="mt-0.5 text-caption text-muted-foreground">{r.custom ? "Eigenes Gebiet" : liftLine(D, r)}</div>
