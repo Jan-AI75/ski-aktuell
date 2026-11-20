@@ -175,7 +175,8 @@ a.btn,button.btn{display:inline-flex;align-items:center;gap:6px;font:600 .86rem 
 .viewer .camnav{top:calc(50% - 22px);background:rgba(20,28,34,.8);border-color:#2a3a46;color:#e9eef2}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
 .pill.soft{background:transparent;border:1px solid var(--line);font-weight:500;color:var(--muted)}
-.depthrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(8em,1fr));gap:8px 14px;padding-top:10px;border-top:1px solid var(--line)}
+.depthrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(8em,1fr));gap:8px 14px}
+.nsblock{display:grid;gap:10px;padding-top:10px;border-top:1px solid var(--line)}
 .depthrow > div{display:grid;gap:1px;min-width:0}
 .depthrow .fl{font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-family:var(--mono)}
 .depthrow .fv{font:500 1.12rem/1.2 var(--mono)}
@@ -517,13 +518,13 @@ function overviewHTML(){
       <div class="t"><div><b>${esc(r.name)}</b><span class="r">${liftLine(r) || esc(r.region || "")}</span><span class="r">${berg ? fmtT(berg.temp) + " · " + wxText(berg.code) : "–"}${(() => { const d0 = pointData(r, r.points.length - 1), sh = berg ? sunHours(d0, berg.di) : null; return sh != null ? " · heute\u00a0" + Math.round(sh) + "\u00a0h\u00a0Sonne" : ""; })()}</span>${(() => { const b = pointStats(pointData(r, r.points.length - 1)); return b && inversion(r, b.di) ? `<span class="r inv">Im Tal trüb, oben Sonne</span>` : ""; })()}</div>
         <div class="lw">Lawine ${lawBadge(r)}<svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
       <div class="stats">
+        ${depthCell(r)}
         <div><div class="fl">Neuschnee</div><div class="fv snow">${berg ? cm(berg.past24) : "–"}<small> cm</small></div><div class="fd">24 h · 72 h: ${berg ? cm(berg.past72) : "–"}</div></div>
         <div><div class="fl">Prognose</div><div class="fv">${berg ? "+" + cm(berg.next72) : "–"}<small> cm</small></div><div class="fd">nächste 3 Tage</div></div>
-        ${depthCell(r)}
       </div>
       ${(() => { const b = bestDay(r); return b ? `<div class="best">Bester Skitag: <b>${b.label}</b></div>` : ""; })()}
     </button>`;
-  }).join("") + `<p class="status" style="margin:2px 2px 0">Neuschnee und Prognose sind Modellwerte für die Bergstation. Schneehöhe: Meldung des Skigebiets, sonst Modell.</p>`;
+  }).join("") + `<p class="status" style="margin:2px 2px 0">Schneehöhe: Meldung des Skigebiets, sonst Modell. Neuschnee und Prognose sind Modellwerte für die Bergstation.</p>`;
 }
 function resortHTML(r){
   const top = r.points.length - 1, P = r.points[top];
@@ -533,14 +534,16 @@ function resortHTML(r){
   const op = opState(r);
   let h = `<section class="hero">
     ${op ? `<div class="opstate ${op.cls}"><span class="dot"></span>${esc(op.txt)}${op.age ? `<em>${esc(op.age)}</em>` : ""}</div>` : ""}
-    <div class="eyebrow">Neuschnee 24 h · ${esc(P.name)} ${P.elev} m</div>
-    <div class="bigrow">
-      <div class="big">${cm(s.past24)}<small>cm</small></div>
-      <div class="fc"><span class="fl">Nächste 3 Tage</span><span class="fv">+${cm(s.next72)} cm</span><span class="fd">morgen +${cm(s.next24)} cm</span></div>
-    </div>
     ${(() => { const dp = depths(r), T = r.points.length > 1 ? r.points[0] : null; return `<div class="depthrow">
       <div><span class="fl">Schneehöhe Berg</span><span class="fv">${cm(dp.berg)} cm</span><span class="fd">${esc(P.elev)} m · ${dp.src}</span></div>
       ${T ? `<div><span class="fl">Schneehöhe Tal</span><span class="fv">${cm(dp.tal)} cm</span><span class="fd">${esc(T.name)} ${T.elev} m · ${dp.src}</span></div>` : ""}</div>`; })()}
+    <div class="nsblock">
+      <div class="eyebrow">Neuschnee 24 h · ${esc(P.name)} ${P.elev} m</div>
+      <div class="bigrow">
+        <div class="big">${cm(s.past24)}<small>cm</small></div>
+        <div class="fc"><span class="fl">Nächste 3 Tage</span><span class="fv">+${cm(s.next72)} cm</span><span class="fd">morgen +${cm(s.next24)} cm</span></div>
+      </div>
+    </div>
     <div class="pills"><span class="pill">${fmtT(s.temp)} · ${wxText(s.code)}${(() => { const sh = sunHours(d, s.di); return sh != null ? " · heute " + Math.round(sh) + " h Sonne" : ""; })()}</span>${snowline != null ? `<span class="pill soft">Schneefallgrenze ~${snowline} m</span>` : ""}</div>
   </section>`;
   h += dayCourseHTML(r, d, s);
